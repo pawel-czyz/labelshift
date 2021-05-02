@@ -5,6 +5,7 @@ import numpy as np
 
 
 class StrictClassifier:
+
     def __init__(self, confusion_matrix: np.ndarray) -> None:
         """
 
@@ -14,9 +15,5 @@ class StrictClassifier:
         """
         self.confusion_matrix = np.asarray(confusion_matrix, dtype=float)
 
-        
-
-
     def generate(n_classes: int) -> np.ndarray:
         pass
-

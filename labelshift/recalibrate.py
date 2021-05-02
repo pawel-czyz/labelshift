@@ -1,6 +1,8 @@
 import numpy as np
 
-def recalibrate(predictions: "arraylike", *, training: "arraylike", test: "arraylike") -> np.ndarray:
+
+def recalibrate(predictions: "arraylike", *, training: "arraylike",
+                test: "arraylike") -> np.ndarray:
     """Recalibrate the probabilities predicted by a classifier under the prior probability shift assumption.
 
     Args:
@@ -18,7 +20,8 @@ def recalibrate(predictions: "arraylike", *, training: "arraylike", test: "array
     training_prevalences = np.array(training, dtype=float)
     test_prevalences = np.array(test, dtype=float)
 
-    assert predictions.shape[1] == len(training_prevalences) == len(test_prevalences), "Shapes are not compatible."
+    assert predictions.shape[1] == len(training_prevalences) == len(
+        test_prevalences), "Shapes are not compatible."
 
     # TODO(t-pczyz): Finish this.
     raise NotImplementedError
