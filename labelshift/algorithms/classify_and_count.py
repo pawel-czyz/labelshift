@@ -1,6 +1,6 @@
 import numpy as np
 
-import quantipy.algorithms.base as base
+import labelshift.algorithms.base as base
 
 
 class ClassifyAndCount(base.AbstractQuantificationAlgorithm):

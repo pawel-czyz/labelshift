@@ -1,11 +1,11 @@
-"""The quantification benchmark package.
+"""Python package for label shift.
 
 Exports:
     BaseQuantificationAlgorithm, a base class for quantification algorithm. All algorithms to be benchmarked methods should sublass from it
 """
-from quantipy.algorithms.base import BaseQuantificationAlgorithm
+from labelshift.algorithms.base import BaseQuantificationAlgorithm
 
-from quantipy.recalibrate import recalibrate
+from labelshift.recalibrate import recalibrate
 
 __all__ = [
     "recalibrate",

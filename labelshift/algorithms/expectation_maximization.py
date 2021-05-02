@@ -1,4 +1,4 @@
-import quantipy.algorithms.base as base
+import labelshift.algorithms.base as base
 
 
 class ExpectationMaximization(base.BaseQuantificationAlgorithm):

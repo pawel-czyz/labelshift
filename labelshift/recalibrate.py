@@ -20,7 +20,5 @@ def recalibrate(predictions: "arraylike", *, training: "arraylike", test: "array
 
     assert predictions.shape[1] == len(training_prevalences) == len(test_prevalences), "Shapes are not compatible."
 
-    
-
-
-    pass
+    # TODO(t-pczyz): Finish this.
+    raise NotImplementedError

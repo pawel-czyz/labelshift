@@ -5,6 +5,6 @@ Implemented algorithms:
     ClassifyAndCount
     AdjustedClassifyAndCount
 """
-from quantipy.algorithms.expectation_maximization import ExpectationMaximization
-from quantipy.algorithms.classify_and_count import AdjustedClassifyAndCount, ClassifyAndCount
+from labelshift.algorithms.expectation_maximization import ExpectationMaximization
+from labelshift.algorithms.classify_and_count import AdjustedClassifyAndCount, ClassifyAndCount
 
