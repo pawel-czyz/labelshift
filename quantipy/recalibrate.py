@@ -1,6 +1,6 @@
 import numpy as np
 
-def recalibrate(predictions: "arraylike", training_prevalences: "arraylike", test_prevalences: "arraylike") -> np.ndarray:
+def recalibrate(predictions: "arraylike", *, training: "arraylike", test: "arraylike") -> np.ndarray:
     """Recalibrate the probabilities predicted by a classifier under the prior probability shift assumption.
 
     Args:
@@ -15,8 +15,8 @@ def recalibrate(predictions: "arraylike", training_prevalences: "arraylike", tes
         If the classifier has been biased towards some classes, this bias will be increased.
     """
     predictions = np.array(predictions, dtype=float)
-    training_prevalences = np.array(training_prevalences, dtype=float)
-    test_prevalences = np.array(test_prevalences, dtype=float)
+    training_prevalences = np.array(training, dtype=float)
+    test_prevalences = np.array(test, dtype=float)
 
     assert predictions.shape[1] == len(training_prevalences) == len(test_prevalences), "Shapes are not compatible."
 

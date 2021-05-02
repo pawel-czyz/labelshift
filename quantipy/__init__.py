@@ -3,7 +3,7 @@
 Exports:
     BaseQuantificationAlgorithm, a base class for quantification algorithm. All algorithms to be benchmarked methods should sublass from it
 """
-from qantipy.base import BaseQuantificationAlgorithm
+from quantipy.algorithms.base import BaseQuantificationAlgorithm
 
 from quantipy.recalibrate import recalibrate
 

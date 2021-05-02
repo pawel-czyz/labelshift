@@ -1,4 +1,4 @@
-import qbench.base as base
+import quantipy.algorithms.base as base
 
 
 class ExpectationMaximization(base.BaseQuantificationAlgorithm):

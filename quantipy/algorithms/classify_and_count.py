@@ -1,6 +1,6 @@
 import numpy as np
 
-import qbench.base as base
+import quantipy.algorithms.base as base
 
 
 class ClassifyAndCount(base.AbstractQuantificationAlgorithm):

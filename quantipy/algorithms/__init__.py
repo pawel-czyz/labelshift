@@ -5,6 +5,6 @@ Implemented algorithms:
     ClassifyAndCount
     AdjustedClassifyAndCount
 """
-from qbench.algorithms.expectation_maximization import ExpectationMaximization
-from qbench.algorithms.classify_and_count import AdjustedClassifyAndCount, ClassifyAndCount
+from quantipy.algorithms.expectation_maximization import ExpectationMaximization
+from quantipy.algorithms.classify_and_count import AdjustedClassifyAndCount, ClassifyAndCount
 
