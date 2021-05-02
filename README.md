@@ -38,3 +38,11 @@ To be able to reproduce a bug, we will usually need the following information:
   - Don't include license information. This project is BSD-3 licensed and by submitting your pull request you implicitly and irrevocably agree to use this.
   - Don't implement too many ideas in a single pull request. Multiple features should be implemented in separate pull requests.
 
+## Installation
+
+For the development, use
+```
+pip install -r requirements.txt
+pre-commit install
+```
+

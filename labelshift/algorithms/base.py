@@ -45,7 +45,7 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
     @property
     def n_classes(self) -> Optional[int]:
         """Number of classes. None if the quantifier
-            has not been fit to the test data set yet."""
+        has not been fit to the test data set yet."""
         return self._n_classes
 
     def fit(self, predictions: ArrayLike, labels: ArrayLike) -> None:
@@ -83,7 +83,7 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
         return self._predict(predictions)
 
     @abc.abstractmethod
-    def _fit(self, predictions: np.ndarray, labels: np.ndarray) -> None:
+    def _fit(self, /, predictions: np.ndarray, labels: np.ndarray) -> None:
         """
 
         Args:
