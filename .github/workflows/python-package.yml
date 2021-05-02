@@ -28,12 +28,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Install labelshift module
+      run: |
         pip install .
     - name: Lint with yapf
       run: |
         yapf --diff -r tests/
         yapf --diff -r labelshift/
     - name: Check docstring coverage with interrogate
+      run: |
         interrogate
     - name: Check types with pytype
       run: |
