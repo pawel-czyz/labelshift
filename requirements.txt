@@ -1,6 +1,7 @@
 numpy
 
 # Code quality tools
+flake8
 interrogate
 pytest
 pytest-cov

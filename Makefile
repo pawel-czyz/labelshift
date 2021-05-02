@@ -1,4 +1,5 @@
 test:
+	flake8
 	pytype
 	interrogate
 	pytest
