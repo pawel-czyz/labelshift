@@ -9,7 +9,7 @@ ignore-module = false
 fail-under = 95
 exclude = ["setup.py", "docs", "build"]
 ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
-verbose = 0
+verbose = 2
 quiet = false
 whitelist-regex = []
 color = true
@@ -21,3 +21,7 @@ addopts = "-ra -q"
 testpaths = [
     "tests",
 ]
+
+[tool.coverage.report]
+fail_under = 100
+

@@ -4,6 +4,7 @@ numpy
 interrogate
 pytest
 pytest-cov
+pytest-mock
 pytest-xdist
 pytype
 yapf
