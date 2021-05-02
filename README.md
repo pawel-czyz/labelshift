@@ -1,4 +1,4 @@
-![build](https://github.com/labelshift/labelshift/actions/workflows/build/badge.svg)
+![build](https://github.com/labelshift/labelshift/actions/workflows/build.yml/badge.svg)
 
 # Label Shift
 

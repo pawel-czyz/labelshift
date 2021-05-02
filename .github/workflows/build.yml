@@ -30,13 +30,12 @@ jobs:
     - name: Check code with flake8
       run: |
         flake8
-    - name: Check whether yapf has been used.
-      run: |
-        yapf --diff -r tests/
-        yapf --diff -r labelshift/
     - name: Check docstring coverage with interrogate
       run: |
         interrogate
+    - name: Check whether black has been used
+      run: |
+        black --check
     - name: Check types with pytype
       run: |
         pytype
