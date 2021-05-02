@@ -23,11 +23,12 @@ def recalibrate(predictions: ArrayLike, *, training: ArrayLike,
         If the classifier has been biased towards some classes, this bias will be increased.
     """
     predictions = np.array(predictions, dtype=float)
-    training_prevalences = np.array(training, dtype=float)
-    test_prevalences = np.array(test, dtype=float)
+    training_prevalences = np.array(training, dtype=float).reshape((1, -1))
+    test_prevalences = np.array(test, dtype=float).reshape((1, -1))
 
-    assert predictions.shape[1] == len(training_prevalences) == len(
-        test_prevalences), "Shapes are not compatible."
+    assert predictions.shape[1] == training_prevalences.shape[1] == test_prevalences.shape[1], "Shapes are not compatible."
 
-    # TODO(t-pczyz): Finish this.
-    raise NotImplementedError
+    recalibrated = predictions * test_prevalences / training_prevalences
+    recalibrated = recalibrated / np.sum(recalibrated, axis=1)[:, None]
+
+    return recalibrated
