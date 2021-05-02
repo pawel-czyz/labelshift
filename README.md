@@ -28,7 +28,7 @@ To be able to reproduce a bug, we will usually need the following information:
 
 **Do:**
 
-  - Do use [Google Style Guide](https://google.github.io/styleguide/pyguide.html). We use [yapf](https://github.com/google/yapf) for code formatting.
+  - Do use [Google Style Guide](https://google.github.io/styleguide/pyguide.html). We use [black](https://github.com/psf/black) for code formatting.
   - Do write unit tests -- 100% code coverage is a necessity. We use [pytest](https://docs.pytest.org/).
   - Do write docstrings -- again, 100% coverage is a necessity. We use [interrogate](https://pypi.org/project/interrogate/).
   - Do consider submitting a *draft* pull request with a description of proposed changes.

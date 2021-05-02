@@ -1,6 +1,6 @@
 """Base classes used to implement quantifiers."""
 import abc
-from typing import Optional, Union
+from typing import Optional
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -10,25 +10,27 @@ class AbstractQuantificationAlgorithm(abc.ABC):
     """An abstract quantification algorithm.
 
     Attributes:
-        predict, returns the vector of prevalences in the test set. Should be implemented by all child classes.
+        predict, returns the vector of prevalences in the test set.
+            Should be implemented by all child classes.
     """
 
     @abc.abstractmethod
     def predict(self, /, predictions: ArrayLike) -> np.ndarray:
         """Returns inferred prevalences.
-        
+
         Args:
             predictions: classifier outputs. Shape (n_samples, n_classes).
-        
+
         Returns:
-            prevalences, shape (n_classes,). All entries are non-negative and they sum up to 1.
+            prevalences, shape (n_classes,).
+                All entries are non-negative and they sum up to 1.
         """
         raise NotImplementedError
 
 
 class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
     """Abstract quantification algorithm.
-    
+
     Attrs:
         n_classes (int or None), number of classes in the data set
         fit, fits a quantifier to the training data set and classifier
@@ -42,19 +44,20 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
 
     @property
     def n_classes(self) -> Optional[int]:
-        """Number of classes. None if the quantifier has not been fit to the test data set yet."""
+        """Number of classes. None if the quantifier
+            has not been fit to the test data set yet."""
         return self._n_classes
 
     def fit(self, predictions: ArrayLike, labels: ArrayLike) -> None:
         """Fits a quantifier to the training data set and the classifier.
 
         Args:
-            predictions: one-hot encoded predictions of the classifier on the test data set. Shape (n_examples, n_classes).
+            predictions: one-hot encoded predictions of the classifier on the
+                test data set. Shape (n_examples, n_classes).
             labels: true labels of the data. Shape (n_examples,).
         """
         predictions, labels = np.array(predictions), np.array(labels)
-        assert len(predictions) == len(
-            labels), "Number of examples must be the same."
+        assert len(predictions) == len(labels), "Number of examples must be the same."
 
         self._n_classes: int = predictions.shape[1]
         self._fit(predictions, labels)
@@ -63,7 +66,8 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
         """Quantifies the test data set.
 
         Args:
-            predictions: one-hot encoded predictions of the classifier on the data set with unknown label prevalences. Shape (n_examples, n_classes).
+            predictions: one-hot encoded predictions of the classifier on the data set
+                with unknown label prevalences. Shape (n_examples, n_classes).
 
         Returns:
             prevalences, shape (n_classes,)
@@ -72,7 +76,8 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
 
         if predictions.shape[1] != self.n_classes:
             raise ValueError(
-                f"The shape of predictions should be {(-1, self.n_classes)}. Was {predictions.shape}."
+                f"The shape of predictions should be {(-1, self.n_classes)}. "
+                f"Was {predictions.shape}."
             )
 
         return self._predict(predictions)
@@ -82,7 +87,8 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
         """
 
         Args:
-            predictions: one-hot encoded predictions of the classifier on the test data set. Shape (n_examples, n_classes).
+            predictions: one-hot encoded predictions of the classifier
+                on the test data set. Shape (n_examples, n_classes).
             labels: true labels of the data. Shape (n_examples,).
         """
         pass
@@ -92,7 +98,9 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
         """
 
         Args:
-            predictions: one-hot encoded predictions of the classifier on the data set with unknown label prevalences. Shape (n_examples, n_classes).
+            predictions: one-hot encoded predictions of the classifier on
+                the data set with unknown label prevalences.
+                Shape (n_examples, n_classes).
 
         Returns:
             prevalences, shape (n_classes,)

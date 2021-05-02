@@ -1,6 +1,7 @@
 numpy
 
 # Code quality tools
+black
 flake8
 interrogate
 pytest
@@ -8,4 +9,3 @@ pytest-cov
 pytest-mock
 pytest-xdist
 pytype
-yapf

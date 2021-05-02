@@ -30,7 +30,10 @@ jobs:
     - name: Install labelshift module
       run: |
         pip install .
-    - name: Lint with yapf
+    - name: Check code with flake8
+      run: |
+        flake8
+    - name: Check whether yapf has been used.
       run: |
         yapf --diff -r tests/
         yapf --diff -r labelshift/
