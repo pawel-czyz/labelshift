@@ -5,7 +5,7 @@ name: labelshift
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main dev ]
   pull_request:
     branches: [ main ]
 
@@ -26,14 +26,23 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
         pip install -r requirements.txt
-    - name: Lint with flake8
+    - name: Install labelshift module
       run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        pip install .
+    - name: Check code with flake8
+      run: |
+        flake8
+    - name: Check whether yapf has been used.
+      run: |
+        yapf --diff -r tests/
+        yapf --diff -r labelshift/
+    - name: Check docstring coverage with interrogate
+      run: |
+        interrogate
+    - name: Check types with pytype
+      run: |
+        pytype
     - name: Test with pytest
       run: |
         pytest
