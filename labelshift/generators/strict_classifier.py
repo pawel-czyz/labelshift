@@ -2,11 +2,12 @@ import math
 from typing import Optional
 
 import numpy as np
+from numpy.typing import ArrayLike
 
 
 class StrictClassifier:
 
-    def __init__(self, confusion_matrix: np.ndarray) -> None:
+    def __init__(self, confusion_matrix: ArrayLike) -> None:
         """
 
         Args:
@@ -15,5 +16,5 @@ class StrictClassifier:
         """
         self.confusion_matrix = np.asarray(confusion_matrix, dtype=float)
 
-    def generate(n_classes: int) -> np.ndarray:
-        pass
+    def generate(self, n_classes: int) -> np.ndarray:
+        raise NotImplementedError

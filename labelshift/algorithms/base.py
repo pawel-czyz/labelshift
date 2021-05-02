@@ -2,8 +2,7 @@ import abc
 from typing import Optional, Union
 
 import numpy as np
-
-ArrayLike = "arraylike"
+from numpy.typing import ArrayLike
 
 
 class AbstractQuantificationAlgorithm(abc.ABC):
@@ -20,7 +19,7 @@ class AbstractQuantificationAlgorithm(abc.ABC):
 
     def predict(self, /, predictions: ArrayLike) -> np.ndarray:
         predictions = np.array(predictions)
-        return np.array(_predict(predictions), dtype=int)
+        return np.array(self._predict(predictions), dtype=float)
 
 
 class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
@@ -43,7 +42,7 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
         assert len(predictions) == len(
             labels), "Number of examples must be the same."
 
-        self._n_classes = property.shape[1]
+        self._n_classes: int = predictions.shape[1]
         self._fit(predictions, labels)
 
     def predict(self, /, predictions: ArrayLike) -> np.ndarray:

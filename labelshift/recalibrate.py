@@ -1,8 +1,9 @@
 import numpy as np
+from numpy.typing import ArrayLike
 
 
-def recalibrate(predictions: "arraylike", *, training: "arraylike",
-                test: "arraylike") -> np.ndarray:
+def recalibrate(predictions: ArrayLike, *, training: ArrayLike,
+                test: ArrayLike) -> np.ndarray:
     """Recalibrate the probabilities predicted by a classifier under the prior probability shift assumption.
 
     Args:

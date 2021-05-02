@@ -23,7 +23,7 @@ class ClassifyAndCount(base.AbstractQuantificationAlgorithm):
     def _predict(self, /, predictions: np.ndarray) -> np.ndarray:
         predicted_class = np.argmax(
             predictions, 1)  # Shape (n_samples,). Entries 0, ..., n_classes-1.
-        histogram = [(predicted_class == i).sum() for i in range(n_classes)]
+        histogram = [(predicted_class == i).sum() for i in range(self.n_classes)]
         return np.array(histogram, dtype=int)
 
 

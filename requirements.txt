@@ -3,5 +3,7 @@ numpy
 # Code quality tools
 interrogate
 pytest
+pytest-cov
+pytest-xdist
 pytype
 yapf
