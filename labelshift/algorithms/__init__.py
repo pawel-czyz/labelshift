@@ -1,4 +1,4 @@
-"""The algorithms submodule. Implementations of popular quantification algorithms.
+"""The quantification algorithms submodule. Implementations of popular quantification algorithms.
 
 Implemented algorithms:
     ExpectationMaximization
