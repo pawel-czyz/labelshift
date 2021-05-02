@@ -1,4 +1,5 @@
-# labelshift
+![build](https://github.com/labelshift/labelshift/actions/workflows/main/badge.svg)
+# Label Shift
 
 Python library for *label shift* (known as prior probability shift, target shift) and *quantification* (estimating the class prevalences in an unlabeled data set under the prior probability shift assumption).
 This module is created with two purposes in mind:
