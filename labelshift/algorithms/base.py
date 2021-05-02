@@ -1,3 +1,4 @@
+"""Base classes used to implement quantifiers."""
 import abc
 from typing import Optional, Union
 
@@ -9,30 +10,43 @@ class AbstractQuantificationAlgorithm(abc.ABC):
     """An abstract quantification algorithm.
 
     Attributes:
-        predict, returns the vector of prevalences  
-    
+        predict, returns the vector of prevalences in the test set. Should be implemented by all child classes.
     """
 
     @abc.abstractmethod
-    def _predict(self, /, predictions: ArrayLike) -> np.ndarray:
-        pass
-
     def predict(self, /, predictions: ArrayLike) -> np.ndarray:
-        predictions = np.array(predictions)
-        return np.array(self._predict(predictions), dtype=float)
+        """Returns inferred prevalences.
+        
+        Args:
+            predictions: classifier outputs. Shape (n_samples, n_classes).
+        
+        Returns:
+            prevalences, shape (n_classes,). All entries are non-negative and they sum up to 1.
+        """
+        raise NotImplementedError
 
 
 class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
+    """Abstract quantification algorithm.
+    
+    Attrs:
+        n_classes (int or None), number of classes in the data set
+        fit, fits a quantifier to the training data set and classifier
+        predict, quantifies the test data set
+
+    All child classes should implement `_fit` and `_predict`.
+    """
 
     def __init__(self) -> None:
         self._n_classes: Optional[int] = None
 
     @property
     def n_classes(self) -> Optional[int]:
+        """Number of classes. None if the quantifier has not been fit to the test data set yet."""
         return self._n_classes
 
     def fit(self, predictions: ArrayLike, labels: ArrayLike) -> None:
-        """
+        """Fits a quantifier to the training data set and the classifier.
 
         Args:
             predictions: one-hot encoded predictions of the classifier on the test data set. Shape (n_examples, n_classes).
@@ -46,7 +60,7 @@ class BaseQuantificationAlgorithm(AbstractQuantificationAlgorithm):
         self._fit(predictions, labels)
 
     def predict(self, /, predictions: ArrayLike) -> np.ndarray:
-        """
+        """Quantifies the test data set.
 
         Args:
             predictions: one-hot encoded predictions of the classifier on the data set with unknown label prevalences. Shape (n_examples, n_classes).

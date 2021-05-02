@@ -6,4 +6,4 @@ Implemented algorithms:
     AdjustedClassifyAndCount
 """
 from labelshift.algorithms.expectation_maximization import ExpectationMaximization
-from labelshift.algorithms.classify_and_count import AdjustedClassifyAndCount, ClassifyAndCount
+from labelshift.algorithms.classify_and_count import ClassifyAndCount

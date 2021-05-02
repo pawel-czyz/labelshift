@@ -14,7 +14,8 @@ def test_training_and_test_the_same(shape: Tuple[int, int]) -> None:
     predictions = np.random.rand(n_samples, n_classes)
     prevalences = np.random.rand(n_classes)
 
-    recalibrated = ls.recalibrate(predictions, training=prevalences, test=prevalences)
+    recalibrated = ls.recalibrate(predictions,
+                                  training=prevalences,
+                                  test=prevalences)
 
     assert (predictions == recalibrated).all()
-

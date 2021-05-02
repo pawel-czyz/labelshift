@@ -1,3 +1,8 @@
+"""Recalibration utilities under the prior probability shift assumption.
+
+Exports:
+    recalibrate, recalibrates output probabilities
+"""
 import numpy as np
 from numpy.typing import ArrayLike
 
