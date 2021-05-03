@@ -4,7 +4,7 @@ from numpy.typing import ArrayLike
 
 
 def normalize_prevalences(raw_prevalences: ArrayLike, /) -> np.ndarray:
-    """
+    """Normalizes prevalence vector.
 
     Args:
         raw_prevalences, will be normalized and reshaped
@@ -13,7 +13,7 @@ def normalize_prevalences(raw_prevalences: ArrayLike, /) -> np.ndarray:
         prevalences, shape (1, n). Sums up to 1.
 
     Raises:
-        ValueError, if any of the entries is 0
+        ValueError, if any of the entries is less or equal to 0
     """
     prevalences = np.array(raw_prevalences, dtype=float).reshape((1, -1))
     prevalences = prevalences / np.sum(prevalences)
