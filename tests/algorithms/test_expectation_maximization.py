@@ -28,7 +28,11 @@ def get_predictions(prevalences: Sequence[int]) -> np.ndarray:
     # Identity matrix. Get perfect prediction for class i as classifier[i].
     classifier = np.eye(n_classes, dtype=float)
 
-    return sum([[classifier[i].tolist()] * k for i, k in enumerate(prevalences)], [])
+    predictions = sum(
+        [[classifier[i].tolist()] * k for i, k in enumerate(prevalences)], []
+    )
+
+    return np.asarray(predictions)
 
 
 def test_perfect_classifier_no_shift() -> None:
