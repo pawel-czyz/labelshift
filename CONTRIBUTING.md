@@ -1,7 +1,7 @@
-## Contribution
+# Contribution guide
 Thank you for your time!
 
-### Reporting a bug
+## Reporting a bug
 
 If you find a bug, please [submit a new issue](https://github.com/labelshift/labelshift/issues).
 
@@ -13,7 +13,7 @@ To be able to reproduce a bug, we will usually need the following information:
   - What is the actual behaviour?
 
 
-### Submitting a pull request
+## Submitting a pull request
 
 **Do:**
 
@@ -21,14 +21,14 @@ To be able to reproduce a bug, we will usually need the following information:
   - Do write unit tests -- 100% code coverage is a necessity. We use [pytest](https://docs.pytest.org/).
   - Do write docstrings -- again, 100% coverage is a necessity. We use [interrogate](https://pypi.org/project/interrogate/).
   - Do consider submitting a *draft* pull request with a description of proposed changes.
-  - Do check the *Development* section.
+  - Do check the [Development section](#development).
 
 **Don't:**
 
   - Don't include license information. This project is BSD-3 licensed and by submitting your pull request you implicitly and irrevocably agree to use this.
   - Don't implement too many ideas in a single pull request. Multiple features should be implemented in separate pull requests.
 
-### Development
+## Development
 To install the repository in editable mode use:
 ```
 pip install -r requirements.txt  # Install dev requirements
