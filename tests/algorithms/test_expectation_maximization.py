@@ -1,3 +1,4 @@
+"""Tests for Expectation Maximization."""
 from typing import Sequence
 import numpy as np
 import numpy.testing as nptest
