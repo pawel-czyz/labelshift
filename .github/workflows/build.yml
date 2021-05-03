@@ -39,7 +39,7 @@ jobs:
         black --check labelshift
     - name: Check types with pytype
       run: |
-        pytype tests
+        # pytype tests
         pytype labelshift
     - name: Test with pytest
       run: |
