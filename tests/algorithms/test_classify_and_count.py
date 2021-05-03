@@ -5,6 +5,7 @@ import numpy.testing as nptest
 import labelshift as ls
 
 
+# TODO(pawel-czyz): This could be refactored into a fixture.
 predictions = [
     [0.4, 0.6],
     [0.7, 0.3],
