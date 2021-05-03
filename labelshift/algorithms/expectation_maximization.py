@@ -24,11 +24,13 @@ def expectation_maximization(
 
     Args:
         predictions: test set probability predictions. Shape (n_samples, n_classes).
-        prevalences: prevalences in the training data set. Shape (n,), (n,1) or (1, n).
-            Will be normalized.
-        initial_prevalences: starting prevalences for optimization. Will be normalized.
+        prevalences: prevalences in the training data set.
+            Shape (n_classes,), (n_classes, 1) or (1, n_classes). Will be normalized.
+        initial_prevalences: starting prevalences for optimization.
             If not provided, the training prevalences are used.
-            Shape (n,), (n,1) or (1, n).
+            Shape (n_classes,), (n_classes, 1) or (1, n_classes). Will be normalized.
+        max_steps: maximal number of iteration steps
+        atol: desired accuracy (for early stopping)
 
     Returns:
         test set prevalences, shape (n,).
@@ -45,17 +47,18 @@ def expectation_maximization(
         test_prevalences = training_prevalences.copy()
 
     for _ in range(max_steps):
+        old_prevalences = test_prevalences.copy()
+
         new_predictions: np.ndarray = recalib.recalibrate(
             predictions, training=training_prevalences, test=test_prevalences
         )
-        new_prevalences: np.ndarray = np.sum(new_predictions, axis=0).reshape(
+        test_prevalences: np.ndarray = np.sum(new_predictions, axis=0).reshape(
             1, -1
         ) / len(new_predictions)
 
-        if np.allclose(new_prevalences, test_prevalences, atol=0.01, rtol=0):
-            test_prevalences = new_prevalences
+        # Check if converged
+        if np.allclose(old_prevalences, test_prevalences, atol=0.01, rtol=0):
             break
-        test_prevalences = new_prevalences
 
     warnings.warn(f"Required accuracy not reached in {max_steps}.")
     return test_prevalences.ravel()
