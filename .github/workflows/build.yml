@@ -40,7 +40,7 @@ jobs:
     - name: Check types with pytype
       run: |
         pytype labelshift
-        pytype tests
+        # pytype tests
     - name: Test with pytest
       run: |
         pytest
