@@ -1,6 +1,7 @@
 """Python package for label shift."""
-from labelshift.recalibrate import recalibrate
 from labelshift.algorithms import expectation_maximization, classify_and_count
+from labelshift.recalibrate import recalibrate
+
 
 __all__ = [
     "recalibrate",

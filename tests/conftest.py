@@ -5,7 +5,7 @@ import random
 
 
 @pytest.fixture
-def set_random():
+def set_random() -> None:
     """Fixture fixing the random seeds."""
     random.seed(0)
     numpy.random.seed(0)
