@@ -23,3 +23,21 @@ def test_training_and_test_the_same(shape: Tuple[int, int], set_random) -> None:
     recalibrated = ls.recalibrate(predictions, training=prevalences, test=prevalences)
 
     nptest.assert_allclose(predictions, recalibrated)
+
+
+def test_known_values() -> None:
+    """Simple case."""
+    train_prev = [0.5, 0.5]
+    test_prev = [0.9, 0.1]
+
+    predictions = [
+        [0.5, 0.5],
+        [0.1, 0.9],
+    ]
+
+    calibrated = [
+        [0.9, 0.1],
+        [0.5, 0.5],
+    ]
+    calibrated1 = ls.recalibrate(predictions, training=train_prev, test=test_prev)
+    nptest.assert_allclose(calibrated, calibrated1)

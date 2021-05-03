@@ -16,9 +16,13 @@ def normalize_prevalences(raw_prevalences: ArrayLike, /) -> np.ndarray:
         ValueError, if any of the entries is less or equal to 0
     """
     prevalences = np.array(raw_prevalences, dtype=float).reshape((1, -1))
+
+    if np.sum(prevalences) <= 0.0:
+        raise ValueError("Probabilities must sum up to a positive value.")
+
     prevalences = prevalences / np.sum(prevalences)
+
     if not np.all(prevalences > 0):
-        raise ValueError(
-            f"All prevalences {prevalences} must be strictly greater than 0."
-        )
+        raise ValueError(f"All prevalences {prevalences} must be positive.")
+
     return prevalences

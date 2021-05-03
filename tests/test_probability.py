@@ -23,5 +23,6 @@ def test_error_raised() -> None:
 
 @pytest.mark.parametrize("p", (0.1, 0.2, -1.0))
 def test_nonnormalizable(p: float) -> None:
+    """Entries sum up to 0."""
     with pytest.raises(ValueError):
         prob.normalize_prevalences([-p, p])

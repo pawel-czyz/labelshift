@@ -60,5 +60,7 @@ def expectation_maximization(
         if np.allclose(old_prevalences, test_prevalences, atol=0.01, rtol=0):
             break
 
-    warnings.warn(f"Required accuracy not reached in {max_steps}.")
+    warnings.warn(
+        RuntimeWarning(f"Required accuracy not reached in {max_steps} steps.")
+    )
     return test_prevalences.ravel()

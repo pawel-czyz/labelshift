@@ -42,7 +42,8 @@ To be able to reproduce a bug, we will usually need the following information:
 
 For the development, use
 ```
-pip install -r requirements.txt
-pre-commit install
+pip install -r requirements.txt  # Install dev requirements
+pip install -e .  # Install the module in editable mode
+pre-commit install  # Install pre-commit hooks
 ```
 
