@@ -1,6 +1,7 @@
 test:
 	flake8
-	pytype
+	pytype labelshift
+	pytype tests
 	interrogate
 	pytest
 

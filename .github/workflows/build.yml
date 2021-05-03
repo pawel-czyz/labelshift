@@ -35,10 +35,12 @@ jobs:
         interrogate
     - name: Check whether black has been used
       run: |
-        black --check
+        black --check tests
+        black --check labelshift
     - name: Check types with pytype
       run: |
-        pytype
+        pytype tests
+        pytype labelshift
     - name: Test with pytest
       run: |
         pytest
