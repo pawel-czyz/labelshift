@@ -18,8 +18,9 @@ To be able to reproduce a bug, we will usually need the following information:
 **Do:**
 
   - Do use [Google Style Guide](https://google.github.io/styleguide/pyguide.html). We use [black](https://github.com/psf/black) for code formatting.
-  - Do write unit tests -- 100% code coverage is a necessity. We use [pytest](https://docs.pytest.org/).
-  - Do write docstrings -- again, 100% coverage is a necessity. We use [interrogate](https://pypi.org/project/interrogate/).
+  - Do write unit tests – 100% code coverage is a necessity. We use [pytest](https://docs.pytest.org/).
+  - Do write docstrings – 100% coverage is a necessity. We use [interrogate](https://pypi.org/project/interrogate/).
+  - Do write high-level documentation as examples and tutorials, illustrating introduced features.
   - Do consider submitting a *draft* pull request with a description of proposed changes.
   - Do check the [Development section](#development).
 
@@ -38,7 +39,6 @@ pre-commit install  # Install pre-commit hooks
 We suggest using a virtual environment for this.
 
 You can use `make` to run the required code quality checks.
-
 
 
 Thank you a lot!
