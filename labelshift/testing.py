@@ -5,7 +5,7 @@ Exports:
 """
 
 
-def weak_prior_probability_shift_test():
+def weak_prior_probability_shift_test():  # pragma: no cover
     """Statistical test for the weak form of prior probability shift
     assumption as in Lipton et al. (2018).
 
