@@ -1,7 +1,13 @@
 import numpy as np
+from numpy.typing import ArrayLike
 
 
-def ratio_estimator() -> np.ndarray:
+def ratio_estimator(
+    *,
+    train_predictions: ArrayLike,
+    train_labels: ArrayLike,
+    test_predictions: ArrayLike,
+) -> np.ndarray:
     """General ratio estimator, as described in Remark 5
     of
     A. Fernandes Vaz et al., Quantification Under Prior Probability
@@ -22,10 +28,14 @@ def ratio_estimator() -> np.ndarray:
     where the predictions are "soft" in the interval :math:`[0, 1]`.
 
     Args:
-
+        train_predictions: predictions of the classifier on the training set.
+            Shape (n_samples, n_classes)
+        train_labels: labels of the training set examples.
+            Shape (n_samples,), (n_samples, 1) or (1, n_samples).
+            Entries should be from the set {0, 1, ..., n_classes-1}.
+        test_predictions: predictions of the classifier on the test test.
 
     Returns:
-        prevalences, shape (n_classes,)
-
+        prevalences on the test set, shape (n_classes,).
     """
     pass

@@ -33,7 +33,7 @@ def expectation_maximization(
         atol: desired accuracy (for early stopping)
 
     Returns:
-        test set prevalences, shape (n,).
+        test set prevalences, shape (n_classes,).
     """
     predictions = np.asarray(predictions, dtype=float)
 
