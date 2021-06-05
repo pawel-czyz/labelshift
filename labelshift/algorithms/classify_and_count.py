@@ -22,6 +22,7 @@ def classify_and_count(predictions: ArrayLike, /) -> np.ndarray:
     predicted_class = np.argmax(
         predictions, axis=1
     )  # Shape (n_samples,). Entries 0, ..., n_classes-1.
+    # TODO(pawel-czyz): Replace with np.bincount().
     histogram = np.array(
         [(predicted_class == i).sum() for i in range(n_classes)], dtype=float
     )  # Shape (n_classes,).
