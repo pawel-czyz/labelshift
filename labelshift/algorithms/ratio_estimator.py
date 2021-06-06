@@ -29,7 +29,7 @@ def ratio_estimator(
     A. Bella et al., Quantification via probability estimators.
     IEEE 10th International Conference on Data Mining (ICDM) (2010), 737--742
 
-    where the predictions are "soft" in the interval :math:`[0, 1]`.
+    where the predictions are "soft" (in the interval :math:`[0, 1]`).
 
     Args:
         train_predictions: predictions of the classifier on the training set.
@@ -48,7 +48,7 @@ def ratio_estimator(
     # Convert to numpy arrays, check whether shapes align, and get the number of classes
     train_predictions, train_labels, test_predictions, n = validate.validate(
         train_predictions=train_predictions,
-        train_labels=train_predictions,
+        train_labels=train_labels,
         test_predictions=test_predictions,
     )
 

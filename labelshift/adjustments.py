@@ -3,7 +3,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 
-def label_hardening(predictions: ArrayLike) -> np.ndarray:
+def label_hardening(predictions: ArrayLike, /) -> np.ndarray:
     """Converts soft-label predictions into one-hot vectors.
 
     Args:
