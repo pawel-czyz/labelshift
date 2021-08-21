@@ -5,15 +5,15 @@ P. Gonzalez, A. Castano, N.V. Chawla, J. J. del Coz,
 A Review on Quantification Learning,
 ACM Computing Surveys, Vol. 50, No. 5. DOI: https://dl.acm.org/doi/10.1145/3117807
 """
-import abc
+from typing import Protocol
 
 import numpy as np
-from numpy.types import ArrayLike
+from numpy.typing import ArrayLike
 
 import labelshift.probability as prob
 
 
-class MulticlassQuantificationError(abc.ABC):
+class MulticlassQuantificationError(Protocol):
     """Base class for scoring multi-class quantification methods.
     Every child class needs to implement `_calculate_error` method.
 
@@ -21,7 +21,6 @@ class MulticlassQuantificationError(abc.ABC):
         error: measures the error of an estimate of true prevalences
     """
 
-    @abc.abstractmehod
     def _calculate_error(self, true: np.ndarray, estimated: np.ndarray) -> float:
         """The main method `error()` is a wrapper around this one.
 
@@ -56,7 +55,7 @@ class MulticlassQuantificationError(abc.ABC):
                 f"Number of classes mismatch: {len(true)} != {len(estimated)}."
             )
 
-        return self._score(true=true, estimated=estimated)
+        return self._calculate_error(true=true, estimated=estimated)
 
 
 class AbsoluteError(MulticlassQuantificationError):
