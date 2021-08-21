@@ -1,3 +1,7 @@
+# Directories for local files
+local/
+private/
+
 # Editors
 .idea/
 .vscode/
