@@ -33,7 +33,7 @@ def expectation_maximization(
         atol: desired accuracy (for early stopping)
 
     Returns:
-        test set prevalences, shape (n,).
+        test set prevalences, shape (n_classes,).
     """
     predictions = np.asarray(predictions, dtype=float)
 
@@ -41,11 +41,13 @@ def expectation_maximization(
         training_prevalences
     )  # Shape (1, n_classes)
 
+    # Set the initial estimate for the test set prevalences
     if initial_prevalences is not None:
         test_prevalences = prob.normalize_prevalences(initial_prevalences)
     else:
         test_prevalences = training_prevalences.copy()
 
+    # Iteratively improve the estimate of the test set prevalences
     for _ in range(max_steps):
         old_prevalences = test_prevalences.copy()
 

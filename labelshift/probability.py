@@ -4,7 +4,7 @@ from numpy.typing import ArrayLike
 
 
 def normalize_prevalences(raw_prevalences: ArrayLike, /) -> np.ndarray:
-    """Normalizes prevalence vector.
+    """Normalizes prevalence vector. Disallows classes of null probability.
 
     Args:
         raw_prevalences, will be normalized and reshaped
