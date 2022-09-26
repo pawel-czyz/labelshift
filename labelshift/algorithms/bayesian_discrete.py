@@ -10,7 +10,7 @@ from numpy.typing import ArrayLike
 P_TRAIN_Y: str = "P_train(Y)"
 P_TEST_Y: str = "P_test(Y)"
 P_TEST_C: str = "P_test(C)"
-P_C_Y: str = "P(C|Y)"
+P_C_COND_Y: str = "P(C|Y)"
 
 
 class SamplingParams(pydantic.BaseModel):
@@ -64,9 +64,9 @@ def sample_from_bayesian_discrete_model_posterior(
         # Prior on pi, pi_, phi
         π = pm.Dirichlet(P_TRAIN_Y, alpha_p_y_labeled)
         π_ = pm.Dirichlet(P_TEST_Y, alpha_p_y_unlabeled)
-        p_c_y = pm.Dirichlet(P_C_Y, np.ones(K), shape=(L, K))
+        p_c_y = pm.Dirichlet(P_C_COND_Y, np.ones(K), shape=(L, K))
 
-        # Note: we need to silence unused variables error (F841)
+        # Note: we need to silence unused variable error (F841)
 
         # Sample N_y from P_train(Y)
         N_y = pm.Multinomial(  # noqa: F841
@@ -79,7 +79,7 @@ def sample_from_bayesian_discrete_model_posterior(
         )
 
         # Sample from P_test(C) = P(C | Y) P_test(Y)
-        p_c = pm.Deterministic("P_test(C)", p_c_y.T @ π_)
+        p_c = pm.Deterministic(P_TEST_C, p_c_y.T @ π_)
         N_c = pm.Multinomial(  # noqa: F841
             "N_c", np.sum(n_c_unlabeled), p=p_c, observed=n_c_unlabeled
         )
