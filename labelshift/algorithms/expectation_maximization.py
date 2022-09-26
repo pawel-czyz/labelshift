@@ -20,7 +20,7 @@ def expectation_maximization(
 
     M. Saerens et al., Adjusting the outputs of a classifier to
         new a priori probabilities: A simple procedure.
-        Neur. Comput.14, 1 (2002), 21--41.
+        Neur. Comput. 14, 1 (2002), 21--41.
 
     Args:
         predictions: test set probability predictions. Shape (n_samples, n_classes).
@@ -59,7 +59,7 @@ def expectation_maximization(
         ) / len(new_predictions)
 
         # Check if converged
-        if np.allclose(old_prevalences, test_prevalences, atol=0.01, rtol=0):
+        if np.allclose(old_prevalences, test_prevalences, atol=atol, rtol=0):
             break
 
     warnings.warn(
