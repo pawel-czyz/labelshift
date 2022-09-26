@@ -65,3 +65,41 @@ class TestDiscreteSampler:
 
         assert summary_stats.n_y_labeled.sum() == n_labeled
         assert summary_stats.n_y_labeled / n_labeled == pytest.approx(p_y, abs=0.02)
+
+        assert summary_stats.n_y_and_c_labeled.sum(axis=1) == pytest.approx(
+            summary_stats.n_y_labeled
+        )
+
+    def test_p_c(self) -> None:
+        p_y_labeled = [0.1, 0.9]
+        p_y_unlabeled = [0.2, 0.8]
+        p_c_cond_y = [
+            [1.0, 0, 0],
+            [0.0, 1, 0],
+        ]
+
+        sampler = dc.DiscreteSampler(
+            p_y_labeled=p_y_labeled, p_y_unlabeled=p_y_unlabeled, p_c_cond_y=p_c_cond_y
+        )
+
+        assert sampler.p_c_labeled == pytest.approx(np.array([0.1, 0.9, 0.0]))
+        assert sampler.p_c_unlabeled == pytest.approx(np.array([0.2, 0.8, 0.0]))
+
+    @pytest.mark.parametrize("n_y", (2, 5))
+    @pytest.mark.parametrize("n_c", (2, 3))
+    def test_create_right_fields(self, n_c: int, n_y: int) -> None:
+        rng = np.random.default_rng(111)
+
+        p_c_cond_y = rng.dirichlet(alpha=np.ones(n_c), size=n_y)
+        p_y_unlabeled = rng.dirichlet(alpha=np.ones(n_y))
+        p_y_labeled = rng.dirichlet(alpha=np.ones(n_y))
+
+        sampler = dc.DiscreteSampler(
+            p_y_labeled=p_y_labeled,
+            p_y_unlabeled=p_y_unlabeled,
+            p_c_cond_y=p_c_cond_y,
+        )
+
+        assert sampler.p_c_cond_y == pytest.approx(p_c_cond_y)
+        assert sampler.p_y_labeled == pytest.approx(p_y_labeled)
+        assert sampler.p_y_unlabeled == pytest.approx(p_y_unlabeled)

@@ -53,6 +53,16 @@ class DiscreteSampler:
         return self._c_cond_y
 
     @property
+    def p_c_unlabeled(self) -> np.ndarray:
+        """P_unlabeled(C) vector, shape (size_C,)"""
+        return self._c_cond_y.T @ self._p_y_unlabeled
+
+    @property
+    def p_c_labeled(self) -> np.ndarray:
+        """P_labeled(C) vector, shape (size_C,)"""
+        return self._c_cond_y.T @ self._p_y_labeled
+
+    @property
     def size_Y(self) -> int:
         """How many Y there are."""
         return self._L
