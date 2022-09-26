@@ -1,4 +1,6 @@
+arviz
 numpy
+pydantic
 
 # Code quality tools
 black
