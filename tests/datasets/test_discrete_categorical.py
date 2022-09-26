@@ -1,3 +1,4 @@
+"""Tests for the discrete categorical sampler."""
 from typing import Sequence
 
 import numpy as np
@@ -62,6 +63,8 @@ class TestDiscreteSampler:
     )
     @pytest.mark.parametrize("n_c", (2, 3))
     def test_p_y_labeled(self, n_c: int, n_labeled: int, p_y: Sequence[float]) -> None:
+        """Tests whether the P_train(Y) looks alright, basing on empirical counts
+        and large sample size."""
         rng = np.random.default_rng(111)
 
         p_c_cond_y = rng.dirichlet(alpha=np.ones(n_c), size=len(p_y))
@@ -85,6 +88,8 @@ class TestDiscreteSampler:
         )
 
     def test_p_c(self) -> None:
+        """Tests whether P_train(C) and P_test(C) are alright,
+        using a trivial P(C|Y) matrix."""
         p_y_labeled = [0.1, 0.9]
         p_y_unlabeled = [0.2, 0.8]
         p_c_cond_y = [
@@ -102,6 +107,7 @@ class TestDiscreteSampler:
     @pytest.mark.parametrize("n_y", (2, 5))
     @pytest.mark.parametrize("n_c", (2, 3))
     def test_create_right_fields(self, n_c: int, n_y: int) -> None:
+        """Tests whether the right fields/attributes are available."""
         rng = np.random.default_rng(111)
 
         p_c_cond_y = rng.dirichlet(alpha=np.ones(n_c), size=n_y)
@@ -117,3 +123,6 @@ class TestDiscreteSampler:
         assert sampler.p_c_cond_y == pytest.approx(p_c_cond_y)
         assert sampler.p_y_labeled == pytest.approx(p_y_labeled)
         assert sampler.p_y_unlabeled == pytest.approx(p_y_unlabeled)
+
+        assert sampler.p_c_labeled.shape == (n_c,)
+        assert sampler.p_c_unlabeled.shape == (n_c,)

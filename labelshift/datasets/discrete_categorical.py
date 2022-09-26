@@ -1,3 +1,4 @@
+"""Discrete categorical sampler."""
 import dataclasses
 
 import numpy as np
@@ -23,9 +24,17 @@ class SummaryStatistic:
 
 
 class DiscreteSampler:
+    """Samples from the discrete model P(C|Y)."""
+
     def __init__(
         self, p_y_labeled: ArrayLike, p_y_unlabeled: ArrayLike, p_c_cond_y: ArrayLike
     ) -> None:
+        """
+        Args:
+            p_y_labeled: P_train(Y) vector, shape (L,)
+            p_y_unlabeled: P_test(Y) vector, shape (L,)
+            p_c_cond_y: P(C|Y), shape (L, K)
+        """
         self._p_y_labeled = np.asarray(p_y_labeled)
         self._p_y_unlabeled = np.asarray(p_y_unlabeled)
         self._c_cond_y = np.asarray(p_c_cond_y)
@@ -97,7 +106,7 @@ class DiscreteSampler:
 
 
 def almost_eye(y: int, c: int, diagonal: float = 1.0) -> np.ndarray:
-    """Matrix P(C | Y).
+    """Matrix P(C | Y) with fixed "diagonal" terms.
 
     Args:
         y: number of different Y labels
