@@ -1,3 +1,8 @@
+"""Categorical discrete Bayesian model for quantification.
+
+Proposed in
+   TODO(Pawel): Add citation to pre-print after AISTATS reviews.
+"""
 from typing import Optional
 
 import arviz as az
@@ -14,6 +19,8 @@ P_C_COND_Y: str = "P(C|Y)"
 
 
 class SamplingParams(pydantic.BaseModel):
+    """Settings for the MCMC sampler."""
+
     draws: pydantic.PositiveInt = pydantic.Field(default=1000)
     chains: pydantic.PositiveInt = pydantic.Field(default=4)
     random_seed: int = 20
@@ -27,7 +34,7 @@ def sample_from_bayesian_discrete_model_posterior(
     alpha_p_y_unlabeled: Optional[ArrayLike] = None,
     sampling_params: Optional[SamplingParams] = None,
 ) -> az.InferenceData:
-    """
+    """Inference in the Bayesian model
 
     Args:
         n_y_labeled: histogram of Y labels in the visible data set  shape (L,),

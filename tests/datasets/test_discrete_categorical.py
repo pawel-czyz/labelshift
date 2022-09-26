@@ -12,7 +12,8 @@ class TestAlmostEye:
     @pytest.mark.parametrize("y", (2, 5))
     @pytest.mark.parametrize("c", (2, 3, 8))
     @pytest.mark.parametrize("diagonal", (0.2, 0.5))
-    def test_shape_sum_max(self, y: int, c: int, diagonal: float) -> None:
+    def test_shape_sum(self, y: int, c: int, diagonal: float) -> None:
+        """Tests the shape of the generated matrix and whether each row sums up to 1."""
         m = dc.almost_eye(y=y, c=c, diagonal=diagonal)
 
         print(m)
@@ -27,12 +28,25 @@ class TestAlmostEye:
 
         assert np.min(m) >= 0, f"Minimum: {np.min(m)} should be non-negative"
 
-    def test_simple_example(self) -> None:
+    def test_simple_example_more_c_than_y(self) -> None:
+        """Test on a simple example what to expect."""
         obtained = dc.almost_eye(y=2, c=3, diagonal=0.6)
         expected = np.asarray(
             [
                 [0.6, 0.2, 0.2],
                 [0.2, 0.6, 0.2],
+            ]
+        )
+        assert obtained == pytest.approx(expected)
+
+    def test_simple_example_more_y_than_c(self) -> None:
+        """Another example, this one is trickier."""
+        obtained = dc.almost_eye(y=3, c=2, diagonal=0.6)
+        expected = np.asarray(
+            [
+                [0.6, 0.4],
+                [0.4, 0.6],
+                [0.5, 0.5],
             ]
         )
         assert obtained == pytest.approx(expected)
