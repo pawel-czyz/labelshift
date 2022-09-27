@@ -3,7 +3,7 @@
 Proposed in
    TODO(Pawel): Add citation to pre-print after AISTATS reviews.
 """
-from typing import Optional
+from typing import cast, NewType, Optional
 
 import arviz as az
 import numpy as np
@@ -26,15 +26,18 @@ class SamplingParams(pydantic.BaseModel):
     random_seed: int = 20
 
 
-def sample_from_bayesian_discrete_model_posterior(
+DiscreteBayesianQuantificationModel = NewType("", pm.Model)
+
+
+def build_model(
     n_y_labeled: ArrayLike,
     n_y_and_c_labeled: ArrayLike,
     n_c_unlabeled: ArrayLike,
     alpha_p_y_labeled: Optional[ArrayLike] = None,
     alpha_p_y_unlabeled: Optional[ArrayLike] = None,
-    sampling_params: Optional[SamplingParams] = None,
-) -> az.InferenceData:
-    """Inference in the Bayesian model
+) -> DiscreteBayesianQuantificationModel:
+    """Builds the discrete Bayesian quantification model,
+     basing on the sufficient statistic of the data.
 
     Args:
         n_y_labeled: histogram of Y labels in the visible data set  shape (L,),
@@ -42,10 +45,7 @@ def sample_from_bayesian_discrete_model_posterior(
         n_y_and_c_labeled: histogram of Y and C labels in the labeled data set,
             shape (L, K)
         n_c_unlabeled: histogram of C in the unlabeled data set, shape (K,)
-        sampling_params: sampling parameters, will be passed to PyMC's sampling method
     """
-    sampling_params = SamplingParams() if sampling_params is None else sampling_params
-
     n_y_labeled = np.asarray(n_y_labeled)
     n_y_and_c_labeled = np.asarray(n_y_and_c_labeled)
     n_c_unlabeled = np.asarray(n_c_unlabeled)
@@ -69,28 +69,44 @@ def sample_from_bayesian_discrete_model_posterior(
     model = pm.Model()
     with model:
         # Prior on pi, pi_, phi
-        π = pm.Dirichlet(P_TRAIN_Y, alpha_p_y_labeled)
-        π_ = pm.Dirichlet(P_TEST_Y, alpha_p_y_unlabeled)
-        p_c_y = pm.Dirichlet(P_C_COND_Y, np.ones(K), shape=(L, K))
+        pi = pm.Dirichlet(P_TRAIN_Y, alpha_p_y_labeled)
+        pi_ = pm.Dirichlet(P_TEST_Y, alpha_p_y_unlabeled)
+        p_c_cond_y = pm.Dirichlet(P_C_COND_Y, np.ones(K), shape=(L, K))
 
         # Note: we need to silence unused variable error (F841)
 
         # Sample N_y from P_train(Y)
         N_y = pm.Multinomial(  # noqa: F841
-            "N_y", np.sum(n_y_labeled), p=π, observed=n_y_labeled
+            "N_y", np.sum(n_y_labeled), p=pi, observed=n_y_labeled
         )
 
         # Sample the rows
         F_yc = pm.Multinomial(  # noqa: F841
-            "F_yc", n_y_labeled, p=p_c_y, observed=n_y_and_c_labeled
+            "F_yc", n_y_labeled, p=p_c_cond_y, observed=n_y_and_c_labeled
         )
 
         # Sample from P_test(C) = P(C | Y) P_test(Y)
-        p_c = pm.Deterministic(P_TEST_C, p_c_y.T @ π_)
+        p_c = pm.Deterministic(P_TEST_C, p_c_cond_y.T @ pi_)
         N_c = pm.Multinomial(  # noqa: F841
             "N_c", np.sum(n_c_unlabeled), p=p_c, observed=n_c_unlabeled
         )
 
+    return cast(DiscreteBayesianQuantificationModel, model)
+
+
+def sample_from_bayesian_discrete_model_posterior(
+    model: DiscreteBayesianQuantificationModel,
+    sampling_params: Optional[SamplingParams] = None,
+) -> az.InferenceData:
+    """Inference in the Bayesian model
+
+    Args:
+        model: built model
+        sampling_params: sampling parameters, will be passed to PyMC's sampling method
+    """
+    sampling_params = SamplingParams() if sampling_params is None else sampling_params
+
+    with model:
         inference_data = pm.sample(
             random_seed=sampling_params.random_seed,
             chains=sampling_params.chains,
