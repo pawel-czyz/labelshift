@@ -1,7 +1,7 @@
 """Tests for adjustment submodule."""
 import numpy.testing as nptest
 
-import labelshift as ls
+import labelshift.adjustments as adj
 
 
 # TODO(pawel-czyz): These tests can be refactored with parametrization fixture.
@@ -21,7 +21,7 @@ def test_label_hardening() -> None:
         [0.0, 1.0],
     ]
 
-    onehot1 = ls.label_hardening(softlabels)
+    onehot1 = adj.label_hardening(softlabels)
     nptest.assert_allclose(onehot1, onehot)
 
 
@@ -39,5 +39,5 @@ def test_label_hardening_square() -> None:
         [0.0, 1.0],
     ]
 
-    onehot1 = ls.label_hardening(softlabels)
+    onehot1 = adj.label_hardening(softlabels)
     nptest.assert_allclose(onehot1, onehot)

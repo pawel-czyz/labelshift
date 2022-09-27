@@ -4,7 +4,7 @@ import numpy as np
 import numpy.testing as nptest
 import pytest
 
-import labelshift as ls
+import labelshift.recalibrate as rc
 
 
 @pytest.mark.parametrize("shape", ((3, 5), (2, 10), (3, 9)))
@@ -20,7 +20,7 @@ def test_training_and_test_the_same(shape: Tuple[int, int], set_random) -> None:
     prevalences = np.random.rand(n_classes)
     prevalences = prevalences / np.sum(prevalences)
 
-    recalibrated = ls.recalibrate(predictions, training=prevalences, test=prevalences)
+    recalibrated = rc.recalibrate(predictions, training=prevalences, test=prevalences)
 
     nptest.assert_allclose(predictions, recalibrated)
 
@@ -39,5 +39,5 @@ def test_known_values() -> None:
         [0.9, 0.1],
         [0.5, 0.5],
     ]
-    calibrated1 = ls.recalibrate(predictions, training=train_prev, test=test_prev)
+    calibrated1 = rc.recalibrate(predictions, training=train_prev, test=test_prev)
     nptest.assert_allclose(calibrated, calibrated1)

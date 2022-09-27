@@ -1,11 +1,5 @@
-"""Python package for label shift."""
-from labelshift.adjustments import label_hardening
-import labelshift.algorithms as algorithms
-from labelshift.recalibrate import recalibrate
+"""The `labelshift` package.
 
-
-__all__ = [
-    "label_hardening",
-    "recalibrate",
-    "algorithms",
-]
+Note:
+    This file should be empty and the imports should go to an API module.
+"""
