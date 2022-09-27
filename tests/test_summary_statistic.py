@@ -45,4 +45,26 @@ class TestCountValues:
 class TestCountValuesJoint:
     """Tests for `count_values_joint`."""
 
-    pass
+    def test_simple(self) -> None:
+        """Tests for a simple example, with N = 2, K = 3."""
+        expected = np.asarray(
+            [
+                [1, 0, 2],
+                [0, 2, 1],
+            ]
+        )
+
+        ns = [0, 0, 0, 1, 1, 1]
+        ks = [0, 2, 2, 1, 1, 2]
+
+        obtained = summ.count_values_joint(
+            n=2,
+            k=3,
+            ns=ns,
+            ks=ks,
+        )
+
+        assert obtained.shape == expected.shape
+        assert np.issubdtype(obtained.dtype, np.integer)
+
+        assert expected == pytest.approx(obtained)
