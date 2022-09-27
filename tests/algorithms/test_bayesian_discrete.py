@@ -28,10 +28,14 @@ def test_right_values(n_labeled: int = 10_000, n_unlabeled: int = 10_000) -> Non
 
     params = bd.SamplingParams(chains=1, draws=100)
 
-    inference_result = bd.sample_from_bayesian_discrete_model_posterior(
+    model = bd.build_model(
         n_y_labeled=statistic.n_y_labeled,
         n_y_and_c_labeled=statistic.n_y_and_c_labeled,
         n_c_unlabeled=statistic.n_c_unlabeled,
+    )
+
+    inference_result = bd.sample_from_bayesian_discrete_model_posterior(
+        model=model,
         sampling_params=params,
     )
 
