@@ -2,7 +2,7 @@
 import numpy as np
 import numpy.testing as nptest
 
-from labelshift import algorithms
+import labelshift.algorithms.classify_and_count as cc
 
 
 # TODO(pawel-czyz): This could be refactored into a fixture.
@@ -15,11 +15,11 @@ predictions = [
 
 def test_list() -> None:
     """Test if works for a list."""
-    prevalences = algorithms.classify_and_count(predictions)
+    prevalences = cc.classify_and_count_from_predictions(predictions)
     nptest.assert_allclose(prevalences, [1 / 3, 2 / 3])
 
 
 def test_array() -> None:
     """Test if works for a numpy array."""
-    prevalences = algorithms.classify_and_count(np.array(predictions))
+    prevalences = cc.classify_and_count_from_predictions(np.array(predictions))
     nptest.assert_allclose(prevalences, [1 / 3, 2 / 3])
