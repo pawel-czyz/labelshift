@@ -58,3 +58,21 @@ def test_between_0_and_1(
 
     assert metric.error(p, q) > 0
     assert metric.error(p, q) < 1
+
+
+@pytest.mark.parametrize("n", [2, 10])
+def test_hellinger_one(n: int) -> None:
+    """Tests whether Hellinger distance gives one for one-hot distributions."""
+
+    for i in range(n):
+        for j in range(n):
+            p = np.zeros(n)
+            p[i] = 1.0
+
+            q = np.zeros_like(p)
+            q[j] == 1.0
+
+            if i == j:
+                assert sc.HellingerDistance().error(p, q) == pytest.approx(0.0)
+            else:
+                assert sc.HellingerDistance().error(p, q) == pytest.approx(1.0)

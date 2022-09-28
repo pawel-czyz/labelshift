@@ -4,7 +4,7 @@ from numpy.typing import ArrayLike
 
 
 def normalize_prevalences(raw_prevalences: ArrayLike, /) -> np.ndarray:
-    """Normalizes prevalence vector. Disallows classes of null probability.
+    """Normalizes prevalence vector.
 
     Args:
         raw_prevalences, will be normalized and reshaped
@@ -21,8 +21,5 @@ def normalize_prevalences(raw_prevalences: ArrayLike, /) -> np.ndarray:
         raise ValueError("Probabilities must sum up to a positive value.")
 
     prevalences = prevalences / np.sum(prevalences)
-
-    if not np.all(prevalences > 0):
-        raise ValueError(f"All prevalences {prevalences} must be positive.")
 
     return prevalences
