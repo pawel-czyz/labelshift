@@ -19,12 +19,6 @@ def test_values() -> None:
     nptest.assert_allclose(prevalences.ravel(), [0.1, 0.3, 0.4, 0.2])
 
 
-def test_error_raised() -> None:
-    """Checks if an error is raised for non-positive probability."""
-    with pytest.raises(ValueError):
-        prob.normalize_prevalences([0.1, 0.0, 0.3])
-
-
 @pytest.mark.parametrize("p", (0.1, 0.2, -1.0))
 def test_nonnormalizable(p: float) -> None:
     """Entries sum up to 0, so that it is not normalizable."""
