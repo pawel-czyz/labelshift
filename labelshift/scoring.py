@@ -5,7 +5,7 @@ P. Gonzalez, A. Castano, N.V. Chawla, J. J. del Coz,
 A Review on Quantification Learning,
 ACM Computing Surveys, Vol. 50, No. 5. DOI: https://dl.acm.org/doi/10.1145/3117807
 """
-from typing import Protocol
+from typing import cast, Protocol
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -70,7 +70,7 @@ class AbsoluteError(MulticlassQuantificationError):
     """
 
     def _calculate_error(self, true: np.ndarray, estimated: np.ndarray) -> float:
-        return np.mean(np.abs(true - estimated))
+        return cast(float, np.mean(np.abs(true - estimated)))
 
 
 class NormalizedAbsoluteError(MulticlassQuantificationError):
@@ -142,7 +142,7 @@ class RelativeAbsoluteError(MulticlassQuantificationError):
         p = _smooth_vector(true, smoothing=self.smoothing)
         p_hat = _smooth_vector(estimated, smoothing=self.smoothing)
 
-        return np.mean(np.abs(p_hat - p) / p)
+        return cast(float, np.mean(np.abs(p_hat - p) / p))
 
 
 class BrayCurtisDissimilarity(MulticlassQuantificationError):
@@ -162,3 +162,47 @@ class BrayCurtisDissimilarity(MulticlassQuantificationError):
         numerator = np.sum(np.abs(true - estimated))
         denominator = np.sum(true + estimated)
         return numerator / denominator
+
+
+class HellingerDistance(MulticlassQuantificationError):
+    """Hellinger distance, ranging between 0 (the best) and 1 (the worst).
+
+    For more information see:
+
+    https://en.wikipedia.org/wiki/Hellinger_distance#Discrete_distributions
+    """
+
+    def _calculate_error(self, true: np.ndarray, estimated: np.ndarray) -> float:
+        s = np.sum((np.sqrt(true) - np.sqrt(estimated)) ** 2)
+
+        return (s / 2) ** 0.5
+
+
+class KLDivergence(MulticlassQuantificationError):
+    """Kullblack-Leibler divergence
+
+    KL (true || estimated)
+    """
+
+    def error(self, true: ArrayLike, estimated: ArrayLike) -> float:
+        return cast(float, np.sum(true * np.log(true / estimated)))
+
+
+class SymmetrisedKLDivergence(MulticlassQuantificationError):
+    """Symmetrised Kullback-Leibler divergence:
+
+    KL( p || q ) + KL( q || p)
+
+    It is also called Jeffreys divergence and has been described here:
+
+    https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence#Symmetrised_divergence
+
+    Note:
+        We use natural logarithm here, so the unit is nat, rather than bit.
+    """
+
+    def __init__(self) -> None:
+        self._kl = KLDivergence()
+
+    def _calculate_error(self, true: np.ndarray, estimated: np.ndarray) -> float:
+        return self._kl.error(true, estimated) + self._kl.error(estimated, true)
