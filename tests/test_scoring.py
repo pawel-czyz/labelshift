@@ -70,7 +70,7 @@ def test_hellinger_one(n: int) -> None:
             p[i] = 1.0
 
             q = np.zeros_like(p)
-            q[j] == 1.0
+            q[j] = 1.0
 
             if i == j:
                 assert sc.HellingerDistance().error(p, q) == pytest.approx(0.0)

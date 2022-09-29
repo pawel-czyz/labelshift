@@ -1,3 +1,7 @@
+# Notebooks are disabled by default
+*.nb
+*.ipynb
+
 # Directories for local files
 local/
 private/
