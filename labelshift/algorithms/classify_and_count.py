@@ -3,6 +3,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 import labelshift.summary_statistic as summ
+import labelshift.interfaces.point_estimators as pe
 
 
 def classify_and_count_from_predictions(predictions: ArrayLike, /) -> np.ndarray:
@@ -63,3 +64,23 @@ def classify_and_count_from_sufficient_statistic(
     """
     n_c = np.asarray(n_c_unlabeled, dtype=float)
     return n_c / n_c.sum()
+
+
+class ClassifyAndCount(pe.SummaryStatisticPrevalenceEstimator):
+    """The class implementing several standard interfaces, which
+    is based on the simple "classify and count" algorithm.
+
+    Note:
+        This algorithm essentially assumes that C and Y are the same.
+    """
+
+    def estimate_from_summary_statistic(
+        self, /, statistic: pe.SummaryStatistic
+    ) -> np.ndarray:
+        """Implementation of the standard method.
+
+        For more information see `classify_and_count_from_summary_statistic`.
+        """
+        return classify_and_count_from_sufficient_statistic(
+            n_c_unlabeled=statistic.n_c_unlabeled
+        )

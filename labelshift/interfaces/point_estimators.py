@@ -28,7 +28,7 @@ class SummaryStatisticPrevalenceEstimator(Protocol):
     """Protocol for methods allowing a point estimate
     from summary statistics of the data."""
 
-    def estimate_from_sufficient_statistic(
+    def estimate_from_summary_statistic(
         self, /, statistic: SummaryStatistic
     ) -> np.ndarray:
         """
