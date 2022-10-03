@@ -1,27 +1,9 @@
 """Discrete categorical sampler."""
-import dataclasses
-
 import math
 import numpy as np
 from numpy.typing import ArrayLike
 
-
-@dataclasses.dataclass
-class SummaryStatistic:
-    """Summary statistics of the generated data set.
-
-    Attrs:
-        n_y_labeled: array of shape (L,) with occurrences of Y
-          in the labeled data set
-        n_y_and_c_labeled: array of shape (L, K) with occurrences
-          of pairs (Y, C) in labeled data set
-        n_c_unlabeled: array of shape (K,) with histogram
-          of occurrences of C in unlabeled data set
-    """
-
-    n_y_labeled: np.ndarray
-    n_y_and_c_labeled: np.ndarray
-    n_c_unlabeled: np.ndarray
+from labelshift.interfaces.point_estimators import SummaryStatistic
 
 
 class DiscreteSampler:
