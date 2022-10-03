@@ -7,12 +7,18 @@ import labelshift.datasets.discrete_categorical as dc
 
 
 @pytest.mark.parametrize("restricted", (True, False))
+@pytest.mark.parametrize("p1_labeled", [0.4, 0.8])
+@pytest.mark.parametrize("p1_unlabeled", [0.2, 0.5, 0.9])
 def test_ratio_estimator_from_sufficient_statistic(
-    restricted: bool, n_labeled: int = 20_000, n_unlabeled: int = 20_000
+    restricted: bool,
+    p1_labeled: float,
+    p1_unlabeled: float,
+    n_labeled: int = 20_000,
+    n_unlabeled: int = 20_000,
 ) -> None:
     """Generates the data according to the P(C|Y) model."""
-    p_y_labeled = np.asarray([0.4, 0.6])
-    p_y_unlabeled = np.asarray([0.7, 0.3])
+    p_y_labeled = np.asarray([1 - p1_labeled, p1_labeled])
+    p_y_unlabeled = np.asarray([1 - p1_unlabeled, p1_unlabeled])
 
     p_c_cond_y = np.asarray(
         [
