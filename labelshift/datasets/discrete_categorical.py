@@ -1,6 +1,7 @@
 """Discrete categorical sampler."""
 import dataclasses
 
+import math
 import numpy as np
 from numpy.typing import ArrayLike
 
@@ -45,6 +46,17 @@ class DiscreteSampler:
 
         assert self._p_y_labeled.shape == (self._L,)
         assert self._p_y_unlabeled.shape == (self._L,)
+
+        assert np.min(self._p_y_labeled) >= 0
+        assert np.min(self._p_y_unlabeled) >= 0
+        assert np.min(self._c_cond_y) >= 0
+
+        assert math.isclose(np.sum(self._p_y_labeled), 1.0)
+        assert math.isclose(np.sum(self._p_y_unlabeled), 1.0)
+
+        for label in range(self._L):
+            s = self._c_cond_y[label, :].sum()
+            assert math.isclose(s, 1.0)
 
     @property
     def p_y_labeled(self) -> np.ndarray:

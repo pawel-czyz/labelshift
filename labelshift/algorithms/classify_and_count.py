@@ -42,3 +42,24 @@ def classify_and_count_from_labels(n_classes: int, labels: ArrayLike) -> np.ndar
     unnormalized = np.asarray(summ.count_values(n_classes, labels), dtype=float)
 
     return unnormalized / unnormalized.sum()
+
+
+def classify_and_count_from_sufficient_statistic(
+    n_c_unlabeled: ArrayLike,
+) -> np.ndarray:
+    """Applies the algorithm to sufficient statistic.
+
+    Args:
+        n_c_unlabeled: shape (K,), which should be the same as (L,)
+          (see below for the explanation of this assumption)
+
+    Note:
+        This approximates P_test(Y) via P_test(C).
+        Of course, it may be a very bad approximation
+        if the classifier is very bad.
+
+        Note that it assumes that the number of possible
+        labels Y is the same as the number of available Cs.
+    """
+    n_c = np.asarray(n_c_unlabeled, dtype=float)
+    return n_c / n_c.sum()

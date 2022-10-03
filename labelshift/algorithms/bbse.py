@@ -39,7 +39,7 @@ def solve_system(
         return np.linalg.lstsq(a=matrix, b=vector, rcond=rcond)[0]
 
 
-def from_sufficient_statistic(
+def bbse_from_sufficient_statistic(
     n_y_and_c_labeled: ArrayLike,
     n_c_unlabeled: ArrayLike,
     p_y_labeled: Optional[ArrayLike] = None,
