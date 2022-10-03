@@ -81,7 +81,7 @@ def prevalence_from_vector_and_matrix(
         )
 
     new_vector = np.ones(K, dtype=float)
-    new_vector[:K] = vector
+    new_vector[: K - 1] = vector
 
     new_matrix = np.ones((L, K), dtype=float)
     new_matrix[:, : (K - 1)] = matrix
