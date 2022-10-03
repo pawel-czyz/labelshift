@@ -50,7 +50,7 @@ def from_sufficient_statistic(
 
     Args:
         n_y_and_c_labeled: the (l, k)th entry contains the number of examples
-          in the labeled data set such that Y = l and C=(f(X)) = k. Shape (L, K)
+          in the labeled data set such that Y = l and C= f(X) = k. Shape (L, K)
         n_c_unlabeled: the `k`th entry contains the number of examples in the
           unlabeled data set such that Y = k. Shape (K,)
         p_y_labeled: the Y prevalence vector in the labeled data set, shape (L,).
