@@ -10,12 +10,18 @@ from typing import Optional
 import numpy as np
 from numpy.typing import ArrayLike
 
+import labelshift.interfaces.point_estimators as pe
+
+# Constant for numerical solver of a linear system.
+# See https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html
+_RCOND: float = 1e-4
+
 
 def solve_system(
     matrix: np.ndarray,
     vector: np.ndarray,
     square_solver: bool,
-    rcond: float = 1e-4,
+    rcond: float = _RCOND,
 ) -> np.ndarray:
     """Finds `x` such that
 
@@ -27,7 +33,7 @@ def solve_system(
         square_solver: if True, we'll use `np.linalg.solve` instead
           of (less restrictive) `np.linalg.lstsq`.
           In this case one needs I = J.
-        rcond: see
+        rcond: used to numerically solve a linear system. See:
           https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html
 
     Returns:
@@ -39,12 +45,12 @@ def solve_system(
         return np.linalg.lstsq(a=matrix, b=vector, rcond=rcond)[0]
 
 
-def from_sufficient_statistic(
+def bbse_from_sufficient_statistic(
     n_y_and_c_labeled: ArrayLike,
     n_c_unlabeled: ArrayLike,
     p_y_labeled: Optional[ArrayLike] = None,
     enforce_square: bool = False,
-    rcond: float = 1e-4,
+    rcond: float = _RCOND,
 ) -> np.ndarray:
     """
 
@@ -57,6 +63,8 @@ def from_sufficient_statistic(
           If not provided, it will be estimated from `n_y_and_c_labeled`.
         enforce_square: whether K = L is enforced. In this case, we will use a different
           solver, which can raise errors
+        rcond: used to numerically solve a linear system. See:
+          https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html
 
     Note:
         In Lipton et al. (2018) paper there is a K = L requirement.
@@ -100,3 +108,39 @@ def from_sufficient_statistic(
     )
 
     return w * p_y_labeled
+
+
+class BlackBoxShiftEstimator(pe.SummaryStatisticPrevalenceEstimator):
+    """Black-Box Shift Estimator which can be applied to different data."""
+
+    def __init__(
+        self,
+        p_y_labeled: Optional[ArrayLike] = None,
+        enforce_square: bool = False,
+        rcond: float = _RCOND,
+    ) -> None:
+        """
+        Args:
+          p_y_labeled: the Y prevalence vector in the labeled data set, shape (L,).
+            If not provided, it will be estimated from `n_y_and_c_labeled`.
+          enforce_square: whether K = L is enforced.
+            In this case, we will use a different
+            solver, which can raise errors
+          rcond: used to numerically solve a linear system. See:
+            https://numpy.org/doc/stable/reference/generated/numpy.linalg.lstsq.html
+        """
+        self._p_y_labeled = p_y_labeled
+        self._enforce_square = enforce_square
+        self._rcond = rcond
+
+    def estimate_from_summary_statistic(
+        self, /, statistic: pe.SummaryStatistic
+    ) -> np.ndarray:
+        """For more information see `bbse_from_sufficient_statistic`."""
+        return bbse_from_sufficient_statistic(
+            n_c_unlabeled=statistic.n_c_unlabeled,
+            n_y_and_c_labeled=statistic.n_y_and_c_labeled,
+            p_y_labeled=self._p_y_labeled,
+            enforce_square=self._enforce_square,
+            rcond=self._rcond,
+        )

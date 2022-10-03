@@ -1,3 +1,6 @@
 """The quantification algorithms submodule.
-Implementations of popular quantification algorithms.
+
+Note:
+    This file should be empty. For the implementations of different
+    quantification algorithms see the API submodule.
 """

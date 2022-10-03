@@ -46,8 +46,10 @@ from typing import Tuple
 import numpy as np
 from numpy.typing import ArrayLike
 
-from labelshift.algorithms.bbse import solve_system
+from labelshift.algorithms.bbse import solve_system, _RCOND
 from labelshift.adjustments import project_onto_probability_simplex
+
+import labelshift.interfaces.point_estimators as pe
 
 
 def prevalence_from_vector_and_matrix(
@@ -139,7 +141,7 @@ def prevalence_from_summary_statistics(
     n_y_and_c_labeled: ArrayLike,
     restricted: bool = True,
     enforce_square: bool = True,
-    rcond: float = 1e-4,
+    rcond: float = _RCOND,
 ) -> np.ndarray:
     """Estimates the prevalence vector from the sufficient statistic.
 
@@ -164,3 +166,38 @@ def prevalence_from_summary_statistics(
         enforce_square=enforce_square,
         rcond=rcond,
     )
+
+
+class InvariantRatioEstimator(pe.SummaryStatisticPrevalenceEstimator):
+    """Invariant Ratio Estimator.
+
+    Afonso Fernandes Vaz, Rafael Izbicki, Rafael Bassi Stern;
+    Quantification Under Prior Probability Shift: the Ratio Estimator and its Extensions
+    Journal of Machine Learning Research, 20(79):1−33, 2019.
+    """
+
+    def __init__(
+        self,
+        restricted: bool = True,
+        enforce_square: bool = False,
+        rcond: float = _RCOND,
+    ) -> None:
+        """
+        Args:
+          enforce_square: whether a square solver should be used.
+            In that case one needs K = L.
+          rcond: parameter of the solver
+          restricted: whether to use restricted or unrestricted estimator
+        """
+        self._restricted = restricted
+        self._enforce_square = enforce_square
+        self._rcond = rcond
+
+    def estimate_from_summary_statistic(
+        self, /, statistic: pe.SummaryStatistic
+    ) -> np.ndarray:
+        """See `prevalence_from_summary_statistics`."""
+        return prevalence_from_summary_statistics(
+            n_c_unlabeled=statistic.n_c_unlabeled,
+            n_y_and_c_labeled=statistic.n_y_and_c_labeled,
+        )

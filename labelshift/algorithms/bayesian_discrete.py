@@ -8,9 +8,13 @@ from typing import cast, NewType, Optional
 import arviz as az
 import numpy as np
 import pydantic
+import pymc
 import pymc as pm
 
 from numpy.typing import ArrayLike
+
+import labelshift.interfaces.point_estimators as pe
+
 
 P_TRAIN_Y: str = "P_train(Y)"
 P_TEST_Y: str = "P_test(Y)"
@@ -26,11 +30,12 @@ class SamplingParams(pydantic.BaseModel):
     random_seed: int = 20
 
 
-DiscreteBayesianQuantificationModel = NewType("", pm.Model)
+DiscreteBayesianQuantificationModel = NewType(
+    "DiscreteBayesianQuantificationModel", pm.Model
+)
 
 
 def build_model(
-    n_y_labeled: ArrayLike,
     n_y_and_c_labeled: ArrayLike,
     n_c_unlabeled: ArrayLike,
     alpha_p_y_labeled: Optional[ArrayLike] = None,
@@ -40,14 +45,12 @@ def build_model(
      basing on the sufficient statistic of the data.
 
     Args:
-        n_y_labeled: histogram of Y labels in the visible data set  shape (L,),
-            where L is the number of labels
         n_y_and_c_labeled: histogram of Y and C labels in the labeled data set,
             shape (L, K)
         n_c_unlabeled: histogram of C in the unlabeled data set, shape (K,)
     """
-    n_y_labeled = np.asarray(n_y_labeled)
     n_y_and_c_labeled = np.asarray(n_y_and_c_labeled)
+    n_y_labeled = n_y_and_c_labeled.sum(axis=1)
     n_c_unlabeled = np.asarray(n_c_unlabeled)
 
     assert len(n_y_and_c_labeled.shape) == 2
@@ -114,3 +117,45 @@ def sample_from_bayesian_discrete_model_posterior(
         )
 
     return inference_data
+
+
+class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
+    """A version of Bayesian quantification which finds the mean solution.
+
+    Note that it runs the MCMC sampler in the backend.
+    """
+
+    def __init__(self) -> None:
+        """Not implemented yet."""
+        raise NotImplementedError
+
+    def estimate_from_summary_statistic(
+        self, /, statistic: pe.SummaryStatistic
+    ) -> np.ndarray:
+        """Returns the mean prediction."""
+        raise NotImplementedError
+
+
+class DiscreteCategoricalMAPEstimator(pe.SummaryStatisticPrevalenceEstimator):
+    """A version of Bayesian quantification
+    which finds the Maximum a Posteriori solution."""
+
+    def __init__(self, max_eval: int = 10_000) -> None:
+        """
+        Args:
+            max_eval: maximal number of evaluations of the posterior
+              during the optimization to find the MAP
+        """
+        self._max_eval = max_eval
+
+    def estimate_from_summary_statistic(
+        self, /, statistic: pe.SummaryStatistic
+    ) -> np.ndarray:
+        """Finds the Maximum a Posteriori (MAP)."""
+        model = build_model(
+            n_c_unlabeled=statistic.n_c_unlabeled,
+            n_y_and_c_labeled=statistic.n_y_and_c_labeled,
+        )
+        with model:
+            optimal = pymc.find_MAP(maxeval=self._max_eval)
+        return optimal[P_TEST_Y]

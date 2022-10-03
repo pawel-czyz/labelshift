@@ -29,7 +29,6 @@ def test_right_values(n_labeled: int = 10_000, n_unlabeled: int = 10_000) -> Non
     params = bd.SamplingParams(chains=1, draws=100)
 
     model = bd.build_model(
-        n_y_labeled=statistic.n_y_labeled,
         n_y_and_c_labeled=statistic.n_y_and_c_labeled,
         n_c_unlabeled=statistic.n_c_unlabeled,
     )

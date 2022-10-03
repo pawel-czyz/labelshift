@@ -72,7 +72,7 @@ def test_bbse_from_sufficient_statistic(
         n_labeled=n_labeled, n_unlabeled=n_unlabeled, seed=111
     )
 
-    p_y_estimated = bbse.from_sufficient_statistic(
+    p_y_estimated = bbse.bbse_from_sufficient_statistic(
         n_y_and_c_labeled=statistic.n_y_and_c_labeled,
         n_c_unlabeled=statistic.n_c_unlabeled,
     )
