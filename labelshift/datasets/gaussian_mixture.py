@@ -1,3 +1,5 @@
+"""Model used for working with exact probabilities
+in the Gaussian mixture model."""
 from typing import Protocol
 
 import numpy as np
@@ -79,7 +81,8 @@ class GaussianMixturePXGivenY(PXGivenY):
         self._dim_x = means.shape[1]
         self._number_y = means.shape[0]
 
-        assert covariances.shape == (means.shape[0], means.shape[1], means.shape[1])
+        if covariances.shape != (means.shape[0], means.shape[1], means.shape[1]):
+            raise ValueError(f"Covariance matrix has wrong shape: {covariances.shape}")
 
         self._distributions = [
             stats.multivariate_normal(
