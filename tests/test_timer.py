@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from labelshift.timer import Timer
+from labelshift.experiments.timer import Timer
 
 
 @pytest.mark.parametrize("t1", [0.1, 0.2])

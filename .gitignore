@@ -6,6 +6,14 @@
 local/
 private/
 
+# Data
+*.json
+*.yml
+*.yaml
+*.csv
+*.npy
+*.npz
+
 # Editors
 .idea/
 .vscode/

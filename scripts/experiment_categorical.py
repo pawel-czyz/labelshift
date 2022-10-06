@@ -9,7 +9,7 @@ import pydantic
 import labelshift.interfaces.point_estimators as pe
 import labelshift.datasets.discrete_categorical as dc
 import labelshift.algorithms.api as algo
-from labelshift.timer import Timer
+import labelshift.experiments.api as exp
 
 
 class Algorithm(enum.Enum):
@@ -90,7 +90,10 @@ def create_parser() -> argparse.ArgumentParser:
         "--seed", type=int, default=42, help="Random seed to sample the data."
     )
     parser.add_argument("--algorithm", type=Algorithm, default=Algorithm.BAYESIAN)
-    parser.add_argument("--output", type=Path, default="output.json")
+    parser.add_argument(
+        "--output", type=Path, default=Path(f"{exp.generate_name()}.json")
+    )
+    parser.add_argument("--output-dir", type=Path, default=None)
 
     parser.add_argument("--alpha", type=float, default=1.0)
     parser.add_argument("--restricted", type=bool, default=False)
@@ -135,7 +138,7 @@ def main() -> None:
         algorithm=args.algorithm, alpha=args.alpha, restricted=args.restricted
     )
 
-    timer = Timer()
+    timer = exp.Timer()
 
     estimate = estimator.estimate_from_summary_statistic(sufficient_statistic)
     elapsed_time = timer.check()
@@ -148,7 +151,13 @@ def main() -> None:
         time=elapsed_time,
     )
 
-    with open(args.output, "w") as f:
+    if args.output_dir is not None:
+        args.output_dir.mkdir(exist_ok=True)
+        output_path = args.output_dir / args.output
+    else:
+        output_path = args.output
+
+    with open(output_path, "w") as f:
         f.write(result.json())
 
     print(result)

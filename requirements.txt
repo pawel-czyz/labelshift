@@ -1,9 +1,9 @@
 arviz
 numpy
+petname
 pydantic
 scikit-learn
 scipy
-
 # Code quality tools
 black
 flake8
