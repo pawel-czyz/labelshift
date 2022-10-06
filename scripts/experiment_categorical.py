@@ -33,15 +33,17 @@ class DiscreteSamplerConfig(pydantic.BaseModel):
     )
 
 
-def get_estimator(algorithm: Algorithm) -> pe.SummaryStatisticPrevalenceEstimator:
+def get_estimator(
+    algorithm: Algorithm, restricted: bool, alpha: float
+) -> pe.SummaryStatisticPrevalenceEstimator:
     if algorithm == Algorithm.CLASSIFY_AND_COUNT:
         return algo.ClassifyAndCount()
     elif algorithm == Algorithm.RATIO_ESTIMATOR:
-        return algo.InvariantRatioEstimator(restricted=False)
+        return algo.InvariantRatioEstimator(restricted=restricted)
     elif algorithm == Algorithm.BBSE:
         return algo.BlackBoxShiftEstimator()
     elif algorithm == Algorithm.BAYESIAN:
-        return algo.DiscreteCategoricalMAPEstimator()
+        return algo.DiscreteCategoricalMAPEstimator(alpha_unlabeled=alpha)
     else:
         raise ValueError(f"Algorithm {algorithm} not recognized.")
 
@@ -90,6 +92,9 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--algorithm", type=Algorithm, default=Algorithm.BAYESIAN)
     parser.add_argument("--output", type=Path, default="output.json")
 
+    parser.add_argument("--alpha", type=float, default=1.0)
+    parser.add_argument("--restricted", type=bool, default=False)
+
     return parser
 
 
@@ -126,7 +131,9 @@ def main() -> None:
     )
     sufficient_statistic = get_sufficient_statistic(sampler_config)
 
-    estimator = get_estimator(algorithm=args.algorithm)
+    estimator = get_estimator(
+        algorithm=args.algorithm, alpha=args.alpha, restricted=args.restricted
+    )
 
     timer = Timer()
 

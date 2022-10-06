@@ -3,7 +3,7 @@
 Proposed in
    TODO(Pawel): Add citation to pre-print after AISTATS reviews.
 """
-from typing import cast, NewType, Optional
+from typing import cast, NewType, Optional, Union
 
 import arviz as az
 import numpy as np
@@ -35,11 +35,31 @@ DiscreteBayesianQuantificationModel = NewType(
 )
 
 
+def dirichlet_alphas(L: int, alpha: Union[float, ArrayLike]) -> np.ndarray:
+    """Convenient initialization of alpha (pseudocounts)
+    parameters of the Dirichlet prior.
+
+    Args:
+        alpha: either an array of shape (L,) or a float.
+          If a float, vector (alpha, alpha, ..., alpha)
+          is created
+
+    Returns:
+         alphas, shape (L,)
+    """
+    if isinstance(alpha, float):
+        return np.ones(L) * alpha
+    else:
+        alpha = np.asarray(alpha)
+        assert alpha.shape == (L,)
+        return alpha
+
+
 def build_model(
     n_y_and_c_labeled: ArrayLike,
     n_c_unlabeled: ArrayLike,
-    alpha_p_y_labeled: Optional[ArrayLike] = None,
-    alpha_p_y_unlabeled: Optional[ArrayLike] = None,
+    alpha_p_y_labeled: Union[float, ArrayLike] = 1.0,
+    alpha_p_y_unlabeled: Union[float, ArrayLike] = 1.0,
 ) -> DiscreteBayesianQuantificationModel:
     """Builds the discrete Bayesian quantification model,
      basing on the sufficient statistic of the data.
@@ -59,15 +79,8 @@ def build_model(
     assert n_y_labeled.shape == (L,)
     assert n_c_unlabeled.shape == (K,)
 
-    alpha_p_y_labeled = (
-        np.ones(L) if alpha_p_y_labeled is None else np.asarray(alpha_p_y_labeled)
-    )
-    alpha_p_y_unlabeled = (
-        np.ones(L) if alpha_p_y_unlabeled is None else np.asarray(alpha_p_y_unlabeled)
-    )
-
-    assert alpha_p_y_labeled.shape == (L,)
-    assert alpha_p_y_unlabeled.shape == (L,)
+    alpha_p_y_labeled = dirichlet_alphas(L, alpha_p_y_labeled)
+    alpha_p_y_unlabeled = dirichlet_alphas(L, alpha_p_y_unlabeled)
 
     model = pm.Model()
     with model:
@@ -140,13 +153,16 @@ class DiscreteCategoricalMAPEstimator(pe.SummaryStatisticPrevalenceEstimator):
     """A version of Bayesian quantification
     which finds the Maximum a Posteriori solution."""
 
-    def __init__(self, max_eval: int = 10_000) -> None:
+    def __init__(
+        self, max_eval: int = 10_000, alpha_unlabeled: Union[float, ArrayLike] = 1.0
+    ) -> None:
         """
         Args:
             max_eval: maximal number of evaluations of the posterior
               during the optimization to find the MAP
         """
         self._max_eval = max_eval
+        self._alpha_unlabeled = alpha_unlabeled
 
     def estimate_from_summary_statistic(
         self, /, statistic: pe.SummaryStatistic
@@ -155,6 +171,7 @@ class DiscreteCategoricalMAPEstimator(pe.SummaryStatisticPrevalenceEstimator):
         model = build_model(
             n_c_unlabeled=statistic.n_c_unlabeled,
             n_y_and_c_labeled=statistic.n_y_and_c_labeled,
+            alpha_p_y_unlabeled=self._alpha_unlabeled,
         )
         with model:
             optimal = pymc.find_MAP(maxeval=self._max_eval)
