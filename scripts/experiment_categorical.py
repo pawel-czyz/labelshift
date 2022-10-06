@@ -98,6 +98,8 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument("--alpha", type=float, default=1.0)
     parser.add_argument("--restricted", type=bool, default=False)
 
+    parser.add_argument("--dry-run", action="store_true")
+
     return parser
 
 
@@ -113,6 +115,12 @@ def main() -> None:
     """The main function of the experiment."""
     parser = create_parser()
     args = parser.parse_args()
+
+    if args.dry_run:
+        print("-- Dry run --\nUsed settings:")
+        print(args)
+        print("Exiting...")
+        return
 
     qual = args.quality
     assert 0 < qual < 1
