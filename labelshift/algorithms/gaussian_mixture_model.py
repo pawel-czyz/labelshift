@@ -5,7 +5,7 @@ to a mixture of Gaussians.
 Note:
     This algorithm models the data in 1D.
 """
-from typing import Optional, Sequence, Tuple
+from typing import Sequence, Tuple, Union
 
 import numpy as np
 import pymc as pm
@@ -21,7 +21,7 @@ def build_model(
     unlabeled_data: ArrayLike,
     mean_params: Tuple[float, float] = (0.0, 1.0),
     sigma_param: float = 1.0,
-    alpha: Optional[ArrayLike] = None,
+    alpha: Union[float, ArrayLike] = None,
 ) -> pm.Model:
     """Builds a PyMC model for Bayesian quantification for 1D data
     assumed to be sampled from a mixture of normals.
@@ -38,7 +38,8 @@ def build_model(
         mean_params: used to initialize the prior on the component means
         sigma_param: used to initialize the prior on the component sigmas
         alpha: used to initialize the Dirichlet prior on P_unlabeled(Y).
-          Shape (n_components,)
+          Can be an array of shape (n_components,)
+          or a float, so that a uniform vector (alpha, alpha, ...) is used.
 
     Returns:
         a PyMC model with the following variables:
@@ -51,8 +52,8 @@ def build_model(
     assert unlabeled_data.shape == (len(unlabeled_data),)
 
     n_y = len(labeled_data)
-    if alpha is None:
-        alpha = np.ones(n_y)
+    if isinstance(alpha, float):
+        alpha = alpha * np.ones(n_y)
     else:
         alpha = np.asarray(alpha)
 
