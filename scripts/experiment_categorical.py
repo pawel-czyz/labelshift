@@ -160,7 +160,7 @@ def main() -> None:
     )
 
     if args.output_dir is not None:
-        args.output_dir.mkdir(exist_ok=True)
+        args.output_dir.mkdir(exist_ok=True, parents=True)
         output_path = args.output_dir / args.output
     else:
         output_path = args.output
