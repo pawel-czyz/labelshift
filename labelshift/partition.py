@@ -32,6 +32,8 @@ class RealLinePartition:
         for k in range(K - 2):
             assert breakpoints[k] < breakpoints[k + 1]
 
+        self._breakpoints = np.asarray(breakpoints)
+
         self._intervals: List[Tuple[float, float]] = (
             [(-_INFINITY, breakpoints[0])]
             + [(breakpoints[k], breakpoints[k + 1]) for k in range(K - 2)]
@@ -76,6 +78,22 @@ class RealLinePartition:
             IndexError, if k >= K (is out of range)
         """
         return self._intervals[k]
+
+    @property
+    def breakpoints(self, include_inf: bool = False) -> np.ndarray:
+        """Returns the breakpoints.
+
+        Args:
+            include_inf: whether the infinities should be returned or not
+
+        Returns:
+            breakpoints. Shape (K-1,) if `include_inf` is False
+              and (K+1,) if `include_inf` is True
+        """
+        if not include_inf:
+            return self._breakpoints.copy()
+        else:
+            return np.asarray([-_INFINITY] + self._breakpoints.tolist() + [_INFINITY])
 
 
 def gaussian_probability_masses(
