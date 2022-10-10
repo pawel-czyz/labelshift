@@ -8,10 +8,12 @@ from labelshift.algorithms.bayesian_discrete import DiscreteCategoricalMAPEstima
 from labelshift.algorithms.bbse import BlackBoxShiftEstimator
 from labelshift.algorithms.classify_and_count import ClassifyAndCount
 from labelshift.algorithms.ratio_estimator import InvariantRatioEstimator
+from labelshift.interfaces.point_estimators import SummaryStatistic
 
 __all__ = [
     "BlackBoxShiftEstimator",
     "ClassifyAndCount",
     "DiscreteCategoricalMAPEstimator",
     "InvariantRatioEstimator",
+    "SummaryStatistic",
 ]
