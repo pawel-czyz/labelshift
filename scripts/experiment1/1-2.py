@@ -13,7 +13,7 @@ algorithms = [
 def main() -> None:
     n_labeled = 1000
     quality = 0.85
-    n_seeds = 10
+    n_seeds = 30
 
     pi_unlabeled = 0.7
     pi_labeled = 0.5

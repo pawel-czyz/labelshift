@@ -13,7 +13,7 @@ def main() -> None:
     n_labeled = 1000
     n_unlabeled = 500
     quality = 0.85
-    n_seeds = 10
+    n_seeds = 30
 
     pi_labeled = 0.5
 
