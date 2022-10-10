@@ -41,7 +41,7 @@ According to our conventions, we will use the transpose of this matrix:
   ``H_hat[l, k] = G_hat[l, k] = E_labeled[ g(X)[k]  | Y = l] \\in R^{L x (K-1)}.``
 
 """
-from typing import Tuple
+from typing import Optional, Tuple
 
 import numpy as np
 from numpy.typing import ArrayLike
@@ -103,9 +103,42 @@ def prevalence_from_vector_and_matrix(
 def calculate_vector_and_matrix_from_predictions(
     unlabeled_predictions: ArrayLike,
     labeled_predictions: ArrayLike,
-) -> None:
-    """This method has not been implemented yet."""
-    raise NotImplementedError
+    labeled_ground_truth: ArrayLike,
+    L: Optional[int] = None,
+    enforce_square: bool = True,
+    restricted: bool = True,
+    rcond: float = 1e-4,
+) -> np.ndarray:
+    """TODO(Pawel): Fix this docstring.
+
+    Args:
+        unlabeled_predictions: shape (N', K)
+        labeled_predictions: shape (N, K)
+        labeled_ground_truth: shape (N,). Each entry is in {0, ..., L-1}.
+    """
+    unlabeled_predictions = np.asarray(unlabeled_predictions)
+    labeled_predictions = np.asarray(labeled_predictions)
+    labeled_ground_truth = np.asarray(labeled_ground_truth, dtype=int)
+
+    K = unlabeled_predictions.shape[1]
+    L: int = K if L is None else L
+
+    assert labeled_predictions.shape == (len(labeled_ground_truth), K)
+
+    unlabeled_vector = unlabeled_predictions.mean(axis=0)[: K - 1]  # Shape (K - 1,)
+    labeled_matrix = np.zeros((L, K - 1))
+
+    for l in range(L):
+        index = labeled_ground_truth == l
+        labeled_matrix[l, :] = labeled_predictions[index, : K - 1].mean(axis=0)
+
+    return prevalence_from_vector_and_matrix(
+        vector=unlabeled_vector,
+        matrix=labeled_matrix,
+        restricted=restricted,
+        enforce_square=enforce_square,
+        rcond=rcond,
+    )
 
 
 def calculate_vector_and_matrix_from_summary_statistics(

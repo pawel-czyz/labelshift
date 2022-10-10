@@ -8,6 +8,7 @@ import labelshift.datasets.split as split
 import labelshift.summary_statistic as summ
 
 import labelshift.algorithms.api as algos
+import labelshift.algorithms.ratio_estimator as re
 from labelshift.algorithms.expectation_maximization import expectation_maximization
 
 
@@ -17,8 +18,7 @@ class Algorithm(enum.Enum):
     BBSE_HARD = "BBSE-Hard"
     RATIO_HARD = "InvariantRatio-Hard"
     BAYESIAN = "Bayesian-MAP"
-    BBSE_SOFT = "BBSE-Soft"
-    RATIO_SOFT = "InvariantRatio-Hard"
+    RATIO_SOFT = "InvariantRatio-Soft"
 
 
 def get_estimate(
@@ -65,10 +65,12 @@ def get_estimate(
         return algos.DiscreteCategoricalMAPEstimator().estimate_from_summary_statistic(
             summary_statistic
         )
-    elif algorithm == Algorithm.BBSE_SOFT:
-        raise NotImplementedError
     elif algorithm == Algorithm.RATIO_SOFT:
-        raise NotImplementedError
+        return re.calculate_vector_and_matrix_from_predictions(
+            unlabeled_predictions=prob_c_unlabeled,
+            labeled_predictions=prob_c_labeled,
+            labeled_ground_truth=y_labeled,
+        )
     else:
         raise ValueError(f"Algorithm {algorithm} not recognized.")
 
