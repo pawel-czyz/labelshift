@@ -128,7 +128,7 @@ def calculate_vector_and_matrix_from_predictions(
     unlabeled_vector = unlabeled_predictions.mean(axis=0)[: K - 1]  # Shape (K - 1,)
     labeled_matrix = np.zeros((L, K - 1))
 
-    for l in range(L):
+    for l in range(L):  # noqa: E741 ambiguous name variable
         index = labeled_ground_truth == l
         labeled_matrix[l, :] = labeled_predictions[index, : K - 1].mean(axis=0)
 
@@ -233,4 +233,6 @@ class InvariantRatioEstimator(pe.SummaryStatisticPrevalenceEstimator):
         return prevalence_from_summary_statistics(
             n_c_unlabeled=statistic.n_c_unlabeled,
             n_y_and_c_labeled=statistic.n_y_and_c_labeled,
+            enforce_square=self._enforce_square,
+            rcond=self._rcond,
         )
