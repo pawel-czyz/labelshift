@@ -7,11 +7,26 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
+rename_dict = {
+    "ClassifyAndCount": "CC",
+    "RatioEstimator": "IR",
+    "BlackBoxShiftEstimator": "BBSE",
+    "BayesianMAP": "MAP",
+}
+
+hue_order = [
+    "CC",
+    "IR",
+    "BBSE",
+    "MAP",
+]
+
+
 def file_to_row(file):
     with open(file) as f:
         x = json.load(f)
     return {
-        "Algorithm": x["algorithm"],
+        "Algorithm": rename_dict[x["algorithm"]],
         "true": x["true"][0],
         "estimated": x["estimated"][0],
         "quality": x["sampler"]["p_c_cond_y"][0][0],
@@ -28,18 +43,10 @@ def experiment_directory_to_dataframe(experiment_directory) -> pd.DataFrame:
     )
     df = pd.DataFrame([file_to_row(f) for f in files])
     df["error"] = df["estimated"] - df["true"]
-
     return df
 
 
 def main() -> None:
-    hue_order = [
-        "ClassifyAndCount",
-        "RatioEstimator",
-        "BlackBoxShiftEstimator",
-        "BayesianMAP",
-    ]
-
     fig, axs = plt.subplots(3, 1, figsize=(4, 12), sharey=False)
 
     experiment1 = "experiment1-1"

@@ -1,6 +1,9 @@
 import enum
 
+import arviz as az
+import matplotlib.pyplot as plt
 import numpy as np
+import pymc as pm
 import sklearn.datasets
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -11,16 +14,16 @@ import labelshift.summary_statistic as summ
 
 import labelshift.algorithms.api as algos
 import labelshift.algorithms.ratio_estimator as re
+import labelshift.algorithms.bayesian_discrete as bay
 from labelshift.algorithms.expectation_maximization import expectation_maximization
 
 
 class Algorithm(enum.Enum):
-    EM = "ExpectationMaximization"
-    CC = "ClassifyAndCount"
-    BBSE_HARD = "BBSE-Hard"
-    RATIO_HARD = "InvariantRatio-Hard"
-    BAYESIAN = "Bayesian-MAP"
-    RATIO_SOFT = "InvariantRatio-Soft"
+    EM = "EM"
+    CC = "CC"
+    BBSE_HARD = "BBSE"
+    RATIO_HARD = "IR: hard"
+    RATIO_SOFT = "IR: soft"
 
 
 def get_estimate(
@@ -63,10 +66,6 @@ def get_estimate(
         return algos.InvariantRatioEstimator(
             restricted=True
         ).estimate_from_summary_statistic(summary_statistic)
-    elif algorithm == Algorithm.BAYESIAN:
-        return algos.DiscreteCategoricalMAPEstimator().estimate_from_summary_statistic(
-            summary_statistic
-        )
     elif algorithm == Algorithm.RATIO_SOFT:
         return re.calculate_vector_and_matrix_from_predictions(
             unlabeled_predictions=prob_c_unlabeled,
@@ -83,7 +82,8 @@ def main() -> None:
     dataset = sklearn.datasets.load_breast_cancer()
     print(len(dataset.target))
 
-    random_seed: int = 22
+    ymax: float = 7.0
+    random_seed: int = 20
     n_training_examples: int = 200
     n_labeled_examples: int = 100
     n_unlabeled_examples: int = 150
@@ -104,7 +104,7 @@ def main() -> None:
 
     classifier = DecisionTreeClassifier(random_state=random_seed + 1)
     classifier = RandomForestClassifier(random_state=random_seed + 1)
-    classifier = LogisticRegression(random_state=random_seed + 1)
+    # classifier = LogisticRegression(random_state=random_seed + 1)
     classifier.fit(datasets.train_x, datasets.train_y)
 
     # The count values
@@ -116,7 +116,36 @@ def main() -> None:
     labeled_probabilities = classifier.predict_proba(datasets.valid_x)
     unlabeled_probabilities = classifier.predict_proba(datasets.test_x)
 
-    for alg in Algorithm:
+    with bay.build_model(
+        n_y_and_c_labeled=n_y_c_labeled,
+        n_c_unlabeled=n_c_unlabeled,
+    ):
+        idata = pm.sample()
+
+    fig, ax = plt.subplots()
+    _, ax_trash = plt.subplots()
+
+    az.plot_posterior(idata, ax=[ax, ax_trash], var_names=bay.P_TEST_Y)
+    ax.set_title(r"$\pi'_1$ posterior")
+
+    ax.vlines(
+        x=prevalence_unlabeled[0],
+        ymin=0,
+        ymax=ymax,
+        label="Ground truth",
+        colors=["k"],
+        linestyles=["--"],
+    )
+
+    linestyles = [
+        "dashdot",
+        "dotted",
+        "dashed",
+        (0, (1, 1)),
+        (0, (3, 10, 1, 10)),
+    ]
+
+    for i, alg in enumerate(Algorithm):
         print(alg)
         estimate = get_estimate(
             algorithm=alg,
@@ -127,7 +156,21 @@ def main() -> None:
             prob_c_unlabeled=unlabeled_probabilities,
             labeled_prevalence=prevalence_labeled,
         )
+
+        ax.vlines(
+            estimate[0],
+            ymin=0,
+            ymax=ymax,
+            label=alg.value,
+            colors=[f"C{i+2}"],
+            linestyles=[linestyles[i]],
+        )
+
         print(estimate)
+
+    fig.legend()
+    fig.tight_layout()
+    fig.savefig("plot_cancer.pdf")
 
 
 if __name__ == "__main__":
