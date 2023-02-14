@@ -206,3 +206,9 @@ class SymmetrisedKLDivergence(MulticlassQuantificationError):
 
     def _calculate_error(self, true: np.ndarray, estimated: np.ndarray) -> float:
         return self._kl.error(true, estimated) + self._kl.error(estimated, true)
+
+
+class FisherRaoDistance(MulticlassQuantificationError):
+    def error(self, true: ArrayLike, estimated: ArrayLike) -> float:
+        bhattacharyya_coefficient = np.dot(np.sqrt(true), np.sqrt(estimated))
+        return 2 * np.arccos(bhattacharyya_coefficient)

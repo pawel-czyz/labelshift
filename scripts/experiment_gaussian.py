@@ -15,6 +15,9 @@ import labelshift.summary_statistic as summ
 import labelshift.algorithms.bayesian_discrete as discrete
 
 
+plt.rcParams.update({"font.size": 22})
+
+
 def plot_distributions(
     ax: plt.Axes,
     X: np.ndarray,
@@ -104,7 +107,7 @@ def main() -> None:
     print(n_c_unlabeled)
     print(n_y_c_labeled)
 
-    fig, axs = plt.subplots(3, figsize=(4, 12))
+    fig, axs = plt.subplots(3, figsize=(6, 9))
     plot_distributions(ax=axs[0], X=X, X1=X1, breakpoints=partition.breakpoints)
 
     with gaussian_model(labeled_data=X_stratified, unlabeled_data=X1):

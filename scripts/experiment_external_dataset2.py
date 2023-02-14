@@ -17,6 +17,8 @@ import labelshift.algorithms.ratio_estimator as re
 import labelshift.algorithms.bayesian_discrete as bay
 from labelshift.algorithms.expectation_maximization import expectation_maximization
 
+plt.rcParams.update({"font.size": 14})
+
 
 class Algorithm(enum.Enum):
     EM = "EM"
@@ -102,7 +104,7 @@ def main() -> None:
         dataset=dataset, specification=specification, random_seed=random_seed
     )
 
-    classifier = DecisionTreeClassifier(random_state=random_seed + 1)
+    # classifier = DecisionTreeClassifier(random_state=random_seed + 1)
     classifier = RandomForestClassifier(random_state=random_seed + 1)
     # classifier = LogisticRegression(random_state=random_seed + 1)
     classifier.fit(datasets.train_x, datasets.train_y)
@@ -122,7 +124,7 @@ def main() -> None:
     ):
         idata = pm.sample()
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(6, 4))
     _, ax_trash = plt.subplots()
 
     az.plot_posterior(idata, ax=[ax, ax_trash], var_names=bay.P_TEST_Y)
@@ -139,9 +141,9 @@ def main() -> None:
 
     linestyles = [
         "dashdot",
-        "dotted",
-        "dashed",
         (0, (1, 1)),
+        "solid",
+        "dashed",
         (0, (3, 10, 1, 10)),
     ]
 
