@@ -27,8 +27,10 @@ def test_ratio_estimator_from_sufficient_statistic(
         ]
     )
 
-    sampler = dc.DiscreteSampler(
-        p_y_labeled=p_y_labeled, p_y_unlabeled=p_y_unlabeled, p_c_cond_y=p_c_cond_y
+    sampler = dc.discrete_sampler_factory(
+        p_y_labeled=p_y_labeled,
+        p_y_unlabeled=p_y_unlabeled,
+        p_c_cond_y_labeled=p_c_cond_y,
     )
     statistic = sampler.sample_summary_statistic(
         n_labeled=n_labeled, n_unlabeled=n_unlabeled, seed=111
