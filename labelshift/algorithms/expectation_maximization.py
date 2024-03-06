@@ -14,7 +14,7 @@ def expectation_maximization(
     *,
     initial_prevalences: Optional[ArrayLike] = None,
     max_steps: int = 10000,
-    atol: float = 0.01,
+    tolerance: float = 0.01,
 ) -> np.ndarray:
     """Expectation maximization algorithm, as described in
 
@@ -24,13 +24,13 @@ def expectation_maximization(
 
     Args:
         predictions: test set probability predictions. Shape (n_samples, n_classes).
-        prevalences: prevalences in the training data set.
+        training_prevalences: prevalences in the training data set.
             Shape (n_classes,), (n_classes, 1) or (1, n_classes). Will be normalized.
         initial_prevalences: starting prevalences for optimization.
             If not provided, the training prevalences are used.
             Shape (n_classes,), (n_classes, 1) or (1, n_classes). Will be normalized.
         max_steps: maximal number of iteration steps
-        atol: desired accuracy (for early stopping)
+        tolerance: desired accuracy (for early stopping)
 
     Returns:
         test set prevalences, shape (n_classes,).
@@ -48,6 +48,7 @@ def expectation_maximization(
         test_prevalences = training_prevalences.copy()
 
     # Iteratively improve the estimate of the test set prevalences
+    converged: bool = False
     for _ in range(max_steps):
         old_prevalences = test_prevalences.copy()
 
@@ -59,10 +60,12 @@ def expectation_maximization(
         ) / len(new_predictions)
 
         # Check if converged
-        if np.allclose(old_prevalences, test_prevalences, atol=atol, rtol=0):
+        if np.max(np.abs(old_prevalences - test_prevalences)) < tolerance:
+            converged = True
             break
 
-    warnings.warn(
-        RuntimeWarning(f"Required accuracy not reached in {max_steps} steps.")
-    )
+    if not converged:
+        warnings.warn(
+            RuntimeWarning(f"Required accuracy not reached in {max_steps} steps.")
+        )
     return test_prevalences.ravel()

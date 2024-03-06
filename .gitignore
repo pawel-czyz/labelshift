@@ -6,6 +6,23 @@
 local/
 private/
 
+# Data
+*.json
+*.yml
+*.yaml
+*.csv
+*.npy
+*.npz
+
+# Plots
+*.eps
+*.gif
+*.jpg
+*.jpeg
+*.pdf
+*.png
+*.svg
+
 # Editors
 .idea/
 .vscode/

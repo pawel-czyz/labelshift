@@ -70,14 +70,14 @@ class TestDiscreteSampler:
         p_c_cond_y = rng.dirichlet(alpha=np.ones(n_c), size=len(p_y))
         p_y_unlabeled = np.ones_like(p_y) / len(p_y)
 
-        sampler = dc.DiscreteSampler(
+        sampler = dc.discrete_sampler_factory(
             p_y_labeled=p_y,
             p_y_unlabeled=p_y_unlabeled,
-            p_c_cond_y=p_c_cond_y,
+            p_c_cond_y_labeled=p_c_cond_y,
         )
 
         summary_stats = sampler.sample_summary_statistic(
-            n_labeled=n_labeled, n_unlabeled=1
+            n_labeled=n_labeled, n_unlabeled=1, seed=12
         )
 
         assert summary_stats.n_y_labeled.sum() == n_labeled
@@ -97,12 +97,14 @@ class TestDiscreteSampler:
             [0.0, 1, 0],
         ]
 
-        sampler = dc.DiscreteSampler(
-            p_y_labeled=p_y_labeled, p_y_unlabeled=p_y_unlabeled, p_c_cond_y=p_c_cond_y
+        sampler = dc.discrete_sampler_factory(
+            p_y_labeled=p_y_labeled,
+            p_y_unlabeled=p_y_unlabeled,
+            p_c_cond_y_labeled=p_c_cond_y,
         )
 
-        assert sampler.p_c_labeled == pytest.approx(np.array([0.1, 0.9, 0.0]))
-        assert sampler.p_c_unlabeled == pytest.approx(np.array([0.2, 0.8, 0.0]))
+        assert sampler.labeled.p_c == pytest.approx(np.array([0.1, 0.9, 0.0]))
+        assert sampler.unlabeled.p_c == pytest.approx(np.array([0.2, 0.8, 0.0]))
 
     @pytest.mark.parametrize("n_y", (2, 5))
     @pytest.mark.parametrize("n_c", (2, 3))
@@ -114,15 +116,17 @@ class TestDiscreteSampler:
         p_y_unlabeled = rng.dirichlet(alpha=np.ones(n_y))
         p_y_labeled = rng.dirichlet(alpha=np.ones(n_y))
 
-        sampler = dc.DiscreteSampler(
+        sampler = dc.discrete_sampler_factory(
             p_y_labeled=p_y_labeled,
             p_y_unlabeled=p_y_unlabeled,
-            p_c_cond_y=p_c_cond_y,
+            p_c_cond_y_labeled=p_c_cond_y,
         )
 
-        assert sampler.p_c_cond_y == pytest.approx(p_c_cond_y)
-        assert sampler.p_y_labeled == pytest.approx(p_y_labeled)
-        assert sampler.p_y_unlabeled == pytest.approx(p_y_unlabeled)
+        assert sampler.labeled.p_c_cond_y == pytest.approx(p_c_cond_y)
+        assert sampler.unlabeled.p_c_cond_y == pytest.approx(p_c_cond_y)
 
-        assert sampler.p_c_labeled.shape == (n_c,)
-        assert sampler.p_c_unlabeled.shape == (n_c,)
+        assert sampler.labeled.p_y == pytest.approx(p_y_labeled)
+        assert sampler.unlabeled.p_y == pytest.approx(p_y_unlabeled)
+
+        assert sampler.labeled.p_c.shape == (n_c,)
+        assert sampler.unlabeled.p_c.shape == (n_c,)
