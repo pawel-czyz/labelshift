@@ -5,6 +5,7 @@
 # Directories for local files
 local/
 private/
+generated/
 
 # Data
 *.json

@@ -41,7 +41,7 @@ def model(summary_statistic):
     with numpyro.plate('plate', L):
         numpyro.sample('F_yc', dist.Multinomial(N_y, p_c_cond_y), obs=n_y_and_c_labeled)
 
-    p_c = numpyro.deterministic("p_c", jnp.einsum("yc,y->c", p_c_cond_y, pi_))
+    p_c = numpyro.deterministic(P_TEST_C, jnp.einsum("yc,y->c", p_c_cond_y, pi_))
     numpyro.sample('N_c', dist.Multinomial(jnp.sum(n_c_unlabeled), p_c), obs=n_c_unlabeled)
 
 
@@ -50,6 +50,10 @@ class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
 
     Note that it runs the MCMC sampler in the backend.
     """
+    P_TRAIN_Y = P_TRAIN_Y
+    P_TEST_Y = P_TEST_Y
+    P_TEST_C = P_TEST_C
+    P_C_COND_Y = P_C_COND_Y
 
     def __init__(self, params: Optional[SamplingParams] = None, seed: int = 42) -> None:
         if params is None:
@@ -57,7 +61,7 @@ class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
         self._params = params
         self._seed = seed
 
-    def get_samples(self, /, statistic: pe.SummaryStatistic):
+    def sample_posterior(self, /, statistic: pe.SummaryStatistic):
         """Returns the samples from the MCMC sampler."""
         mcmc = numpyro.infer.MCMC(
             numpyro.infer.NUTS(model),
@@ -71,5 +75,5 @@ class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
         self, /, statistic: pe.SummaryStatistic
     ) -> np.ndarray:
         """Returns the mean prediction."""
-        samples = self.get_samples(statistic)[P_TEST_Y]
+        samples = self.sample_posterior(statistic)[P_TEST_Y]
         return np.array(samples.mean(axis=0))
