@@ -1,7 +1,9 @@
+# ---------------------------------------------------
+# - Experiment with a nearly non-identifiable model -
+# ---------------------------------------------------
 from dataclasses import dataclass
 import numpy as np
 import matplotlib.pyplot as plt
-# import seaborn as sns
 import pandas as pd
 import joblib
 

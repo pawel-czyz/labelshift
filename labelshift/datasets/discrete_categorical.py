@@ -13,6 +13,13 @@ RNG = Any
 
 @dataclasses.dataclass
 class SummaryMultinomialStatistic:
+    """
+    
+    Attributes:
+        n_y: shape (L,)
+        n_c: shape (K,)
+        n_y_and_c: shape (L, K)
+    """
     n_y: np.ndarray
     n_c: np.ndarray
     n_y_and_c: np.ndarray

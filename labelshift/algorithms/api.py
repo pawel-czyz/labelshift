@@ -4,7 +4,7 @@ Use as:
 
 >>> import labelshift.algorithms.api as algo
 """
-from labelshift.algorithms.bayesian_discrete import DiscreteCategoricalMeanEstimator
+from labelshift.algorithms.bayesian_discrete import DiscreteCategoricalMeanEstimator, SamplingParams
 from labelshift.algorithms.bbse import BlackBoxShiftEstimator
 from labelshift.algorithms.classify_and_count import ClassifyAndCount
 from labelshift.algorithms.ratio_estimator import InvariantRatioEstimator
@@ -16,4 +16,5 @@ __all__ = [
     "DiscreteCategoricalMeanEstimator",
     "InvariantRatioEstimator",
     "SummaryStatistic",
+    "SamplingParams",
 ]
