@@ -130,7 +130,7 @@ METRICS = {
 }
 
 
-N_SEEDS: int = 20
+N_SEEDS: int = 50
 
 @dataclass
 class BenchmarkSettings:
@@ -402,6 +402,7 @@ rule plot_large_plot:
         data = pd.read_csv(input.jointly_lk, index_col=False)
         plot_results(ax, data)
         ax.set_xlabel("Number of labels $L=K$")
+        ax.set_xticks([3, 5, 7, 9])
 
         # Change misspecification
         ax = axs[1, 2]
