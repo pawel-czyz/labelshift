@@ -309,13 +309,14 @@ rule plot_coverage:
         ax.set_xticks([0, 0.25, 0.5, 0.75, 1])
         ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
 
-        ax.set_xlabel("Expected coverage")
-        ax.set_ylabel("Observed coverage")
+        ax.set_title("Coverage")
+        ax.set_xlabel("Expected")
+        ax.set_ylabel("Observed")
 
         def plot_data(data, label, color):
             covs = np.load(data)
-            ax.plot(COVERAGES, covs, c=color)
-            ax.scatter(COVERAGES, covs, label=label, c=color, s=5)
+            ax.plot(COVERAGES, covs, c=color, label=label)
+            ax.scatter(COVERAGES, covs, c=color, s=5)
 
         plot_data(input["gaussian"], "Gaussian", "C1")
         plot_data(input["student"], "Student", "C2")
