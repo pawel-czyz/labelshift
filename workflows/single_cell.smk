@@ -39,9 +39,10 @@
 #
 # -------------------------------------------------------------------------------------------------------
 
-import scanpy as sc
-import pandas as pd
 import numpy as np
+import pandas as pd
+import scanpy as sc
+
 import matplotlib
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
@@ -50,9 +51,15 @@ matplotlib.use("Agg")
 from subplots_from_axsize import subplots_from_axsize
 
 from sklearn.decomposition import PCA
-from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import LabelEncoder
 
+import labelshift.algorithms.api as algo
+import labelshift.summary_statistic as summ
+import labelshift.algorithms.ratio_estimator as re
+from labelshift.datasets.discrete_categorical import SummaryStatistic
+from labelshift.algorithms.expectation_maximization import expectation_maximization
 
 workdir: "generated/single_cell"
 
@@ -72,6 +79,9 @@ rule create_adata:
         adata = sc.read_mtx(input.mtx).T
         adata.var_names = pd.read_csv(input.genes, header=None)[0].values
         adata.obs = pd.read_csv(input.cells)
+        adata.obs["cell_type"] = adata.obs["cell_type"].replace({
+            "Oligodendrocyte": "Oligo."
+        })
         adata.write(output.data)
 
         with open(output.summary, "a") as f:
@@ -79,7 +89,7 @@ rule create_adata:
                 f.write(f"{name}: {c}\n")
 
 
-rule create_rough_cell_types:
+rule create_aggregated_cell_types:
     input: "data/full_data.h5ad"
     output: "data/aggregated_data.h5ad"
     run:
@@ -192,7 +202,9 @@ rule plot_p_x_y:
 
 rule manuscript_plot:
     input:
-        full_data = "data/full_data.h5ad"
+        full_data = "data/full_data.h5ad",
+        proportions_full = "proportions/full.npz",
+        proportions_agg = "proportions/aggregated.npz"
     output: "plots/manuscript_plot.pdf"
     run:
         adata = sc.read_h5ad(input[0])
@@ -200,7 +212,7 @@ rule manuscript_plot:
         pca.fit(get_features(adata))
         reps = pca.transform(get_features(adata))
 
-        fig, axs = subplots_from_axsize(axsize=([1, 1, 1.5, 1.5], 1), dpi=150, top=0.3, left=0.1, wspace=[0.3, 0.5, 0.5])
+        fig, axs = subplots_from_axsize(axsize=([1, 1, 1.5, 1.5], 1), dpi=150, top=0.3, left=0.1, wspace=[0.3, 0.7, 0.7], bottom=0.8, right=0.8)
         axs = axs.ravel()
 
         cell_type_encoder, sample_encoder = construct_encoders(adata)
@@ -221,11 +233,185 @@ rule manuscript_plot:
         axs[1].set_title("Cell types")
         plot_cells(axs[1], reps[:, 0], reps[:, 1], types=adata.obs["cell_type"], encoder=cell_type_encoder, include_legend=True, bbox_to_anchor=(-1.3, -0.05), fontsize=6, ncol=3)
 
-        # fig.tight_layout()
+        ESTIMATOR_NAMES = {
+            "bbs": "BBS",
+            "rir": "RIR",
+            "cc": "CC",
+            "em": "EM",
+            "rir_soft": "RIR (soft)",
+        }
+        ESTIMATOR_COLORS = {
+            "bbs": "maroon",
+            "rir": "limegreen",
+            "cc": "red",
+            "em": "purple",
+            "rir_soft": "orange",
+        }
+
+        def plot(ax, props):
+            x_axis = np.arange(len(props["cell_types"]))
+            ax.set_xticks(x_axis, labels=props["cell_types"], rotation=70)
+            ax.set_ylabel("Proportion")
+
+            # Ground-truth
+            ax.scatter(x_axis, props["true"], s=5**2, c="black", marker=".", rasterized=True)
+            ax.plot(x_axis, props["true"], c="black", label="Observed", linestyle="--", linewidth=2, rasterized=True)
+
+            # Posterior samples
+            for sample in props["posterior"][-200:]:
+                ax.plot(x_axis, sample, c="darkblue", alpha=0.1, linewidth=0.1, rasterized=True)
+                ax.scatter(x_axis, sample, s=1, c="darkblue", alpha=0.08, marker=".", rasterized=True)
+
+            # Posterior mean
+            posterior_mean = np.mean(props["posterior"], axis=0)
+            ax.plot(x_axis, posterior_mean, c="darkblue", label="Posterior\nmean", linewidth=1, alpha=0.5, rasterized=True)
+            ax.scatter(x_axis, posterior_mean, s=3**2, c="darkblue", alpha=0.5, marker=".", rasterized=True)
+
+            # Point estimators
+            for estimator, name in ESTIMATOR_NAMES.items():
+                ax.plot(x_axis, props[estimator], c=ESTIMATOR_COLORS[estimator], label=name, alpha=0.5, linewidth=1, rasterized=True)
+                ax.scatter(x_axis, props[estimator], s=3**2, c=ESTIMATOR_COLORS[estimator], alpha=0.5, marker=".", rasterized=True)
+
+        # Plot predictions: full data
+        ax = axs[2]
+        ax.set_title("All cell types")
+        plot(ax, np.load(input.proportions_full, allow_pickle=True))
+
+        # Plot predictions: aggregated
+        ax = axs[3]
+        ax.set_title("Aggregated cell types")
+        plot(ax, np.load(input.proportions_agg, allow_pickle=True))
+
+        ax.legend(frameon=False, loc="upper left", bbox_to_anchor=(1, 1), fontsize=6)
+
+
         fig.savefig(output[0])
 
-# rule estimate_proportions:
-#     input: "data/{name}.h5ad"
-#     output: "proportions/{name}.joblib"
-#     run:
-        # Load the data, select training, validation, and test sets
+
+rule estimate_proportions:
+    input: "data/{name}_data.h5ad"
+    output:
+        estimates = "proportions/{name}.npz",
+        error_log = "proportions/{name}.log"
+    run:
+        # Load the data
+        adata = sc.read_h5ad(input[0])
+        cell_type_encoder, sample_encoder = construct_encoders(adata)
+
+        L = len(cell_type_encoder.classes_)
+
+        # Select training, validation, and test sets
+        train_samples = ["BT_S1", "BT_S2"]
+        valid_sample = "BT_S4"
+        test_sample = "BT_S6"
+        assert len(set(train_samples + [valid_sample, test_sample])) == 4
+
+        train_data = adata[(adata.obs["sample"] == train_samples[0]) | (adata.obs["sample"] == train_samples[1])].copy()
+        valid_data = adata[adata.obs["sample"] == valid_sample].copy()
+        test_data = adata[adata.obs["sample"] == test_sample].copy()
+
+        # Do PCA + random forest
+        pca = PCA(n_components=50, random_state=0)
+        pca.fit(get_features(train_data))
+
+        forest = RandomForestClassifier(n_estimators=20, n_jobs=-1, random_state=42)
+        forest.fit(get_features(train_data), cell_type_encoder.transform(train_data.obs["cell_type"]))
+
+        valid_predicted = forest.predict(get_features(valid_data))
+        valid_labels = cell_type_encoder.transform(valid_data.obs["cell_type"])
+
+        test_predicted = forest.predict(get_features(test_data))
+
+        # Create summary statistic
+        n_y_and_c_labeled = summ.count_values_joint(L, L, valid_labels, valid_predicted)
+        n_y_labeled = summ.count_values(L, valid_labels)
+        n_c_unlabeled = summ.count_values(L, test_predicted)
+        statistic = SummaryStatistic(
+            n_y_labeled=n_y_labeled,
+            n_y_and_c_labeled=n_y_and_c_labeled,
+            n_c_unlabeled=n_c_unlabeled,
+        )
+
+        posterior = algo.DiscreteCategoricalMeanEstimator().sample_posterior(statistic)[algo.DiscreteCategoricalMeanEstimator.P_TEST_Y]
+
+        failed_counter = 0
+
+        try:
+            bbs = algo.BlackBoxShiftEstimator(enforce_square=True).estimate_from_summary_statistic(statistic)
+        except Exception as e:
+            bbs = np.full(L, np.nan)
+            failed_counter += 1
+            with open(output.error_log, "a") as f:
+                f.write("BBS failed\n")
+                f.write(str(e))
+                f.write("\n")
+
+        try:
+            rir = algo.InvariantRatioEstimator(restricted=True, enforce_square=True).estimate_from_summary_statistic(statistic)
+        except Exception as e:
+            rir = np.full(L, np.nan)
+            failed_counter += 1
+            with open(output.error_log, "a") as f:
+                f.write("RIR (hard) failed\n")
+                f.write(str(e))
+                f.write("\n")
+
+        try:
+            cc = algo.ClassifyAndCount().estimate_from_summary_statistic(statistic)
+        except Exception as e:
+            cc = np.full(L, np.nan)
+            failed_counter += 1
+            with open(output.error_log, "a") as f:
+                f.write("CC failed\n")
+                f.write(str(e))
+                f.write("\n")
+
+        # Algorithms using soft labels
+        soft_pred = forest.predict_proba(get_features(test_data))
+
+        try:
+            _jitter = 0
+            em = expectation_maximization(
+                predictions=soft_pred,
+                training_prevalences=(n_y_labeled + _jitter) / np.sum(n_y_labeled + _jitter),
+            )
+        except Exception as e:
+            em = np.full(L, np.nan)
+            failed_counter += 1
+            with open(output.error_log, "a") as f:
+                f.write("EM failed\n")
+                f.write(str(e))
+                f.write("\n")
+
+        try:
+            rir_soft = re.calculate_vector_and_matrix_from_predictions(
+                unlabeled_predictions=soft_pred,
+                labeled_predictions=forest.predict_proba(get_features(valid_data)),
+                labeled_ground_truth=valid_labels,
+            )
+        except Exception as e:
+            rir_soft = np.full(L, np.nan)
+            failed_counter += 1
+            with open(output.error_log, "a") as f:
+                f.write("RIR (soft) failed\n")
+                f.write(str(e))
+                f.write("\n")
+
+        with open(output.error_log, "a") as f:
+            f.write("\n\nSummary:\n")
+            f.write(f"Failed runs: {failed_counter}\n")
+
+        test_labels = cell_type_encoder.transform(test_data.obs["cell_type"])
+        n_y_test = summ.count_values(L, test_labels)
+        ordering = np.argsort(n_y_test)[::-1]
+
+        np.savez(output.estimates, **{
+            "posterior": posterior[:, ordering],
+            "bbs": bbs[ordering],
+            "rir": rir[ordering],
+            "cc": cc[ordering],
+            "em": em[ordering],
+            "rir_soft": rir_soft[ordering],
+            "true": n_y_test[ordering] / np.sum(n_y_test),
+            "cell_types": np.asarray(cell_type_encoder.classes_)[ordering],
+        })
