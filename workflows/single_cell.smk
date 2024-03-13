@@ -165,7 +165,7 @@ rule plot_p_x_y:
         cell_type_encoder, sample_encoder = construct_encoders(adata)
         n_samples = len(sample_encoder.classes_)
 
-        fig, axs = plt.subplots(2, n_samples, figsize=(n_samples * 1.5, 2 * 1.2), dpi=150)
+        fig, axs = plt.subplots(2, n_samples, figsize=(n_samples * 1.5, 2 * 1.2), dpi=300)
 
         for ax in axs.ravel():
             ax.spines[["top", "right"]].set_visible(False)
@@ -212,7 +212,7 @@ rule manuscript_plot:
         pca.fit(get_features(adata))
         reps = pca.transform(get_features(adata))
 
-        fig, axs = subplots_from_axsize(axsize=([1, 1, 1.5, 1.5], 1), dpi=150, top=0.3, left=0.1, wspace=[0.3, 0.7, 0.7], bottom=0.8, right=0.8)
+        fig, axs = subplots_from_axsize(axsize=([1, 1, 1.5, 1.5], 1), dpi=300, top=0.3, left=0.1, wspace=[0.3, 0.7, 0.7], bottom=0.8, right=0.8)
         axs = axs.ravel()
 
         cell_type_encoder, sample_encoder = construct_encoders(adata)
@@ -368,12 +368,14 @@ rule estimate_proportions:
 
         # Algorithms using soft labels
         soft_pred = forest.predict_proba(get_features(test_data))
+        
+        train_counts = summ.count_values(L, cell_type_encoder.transform(train_data.obs["cell_type"]))
 
         try:
             _jitter = 0
             em = expectation_maximization(
                 predictions=soft_pred,
-                training_prevalences=(n_y_labeled + _jitter) / np.sum(n_y_labeled + _jitter),
+                training_prevalences=train_counts / np.sum(train_counts),
             )
         except Exception as e:
             em = np.full(L, np.nan)
