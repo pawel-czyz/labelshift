@@ -235,4 +235,5 @@ class InvariantRatioEstimator(pe.SummaryStatisticPrevalenceEstimator):
             n_y_and_c_labeled=statistic.n_y_and_c_labeled,
             enforce_square=self._enforce_square,
             rcond=self._rcond,
+            restricted=self._restricted,
         )
