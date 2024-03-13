@@ -3,12 +3,12 @@
 # ----------------------------------------------------------------------------------
 from dataclasses import dataclass
 import numpy as np
-import matplotlib.pyplot as plt
-# import seaborn as sns
 import pandas as pd
 import joblib
 
 import matplotlib
+import matplotlib.pyplot as plt
+from subplots_from_axsize import subplots_from_axsize
 matplotlib.use("agg")
 
 import jax
@@ -243,7 +243,9 @@ rule plot_coverage:
         sample_discrete10 = "samples/{n_points}/Discrete-10/1.npy",
     output: "plots/{n_points}.pdf"
     run:
-        fig, axs = plt.subplots(1, 4, figsize=(4 * 3, 2.1), dpi=150)
+        fig, axs = subplots_from_axsize(axsize=(2, 1), wspace=[0.2, 0.3, 0.6],  dpi=150, left=0.2, top=0.3, right=1.8)
+        axs = axs.ravel()
+
         # Conditional distributions P(X|Y)
         ax = axs[0]
         rng = np.random.default_rng(42)
@@ -302,7 +304,7 @@ rule plot_coverage:
         ps = np.linspace(1e-3, 1 - 1e-3, 51)
         ax.plot(ps, ps, linestyle="--", c="black")
         se = np.sqrt(ps * (1-ps) / N_SEEDS)
-        ax.fill_between(ps, ps - 2 * se, ps + 2 * se, alpha=0.1, color="k", ec=None)
+        # ax.fill_between(ps, ps - 2 * se, ps + 2 * se, alpha=0.1, color="k", ec=None)
 
         ax.set_xlim(-0.02, 1.02)
         ax.set_ylim(-0.02, 1.02)
@@ -326,5 +328,4 @@ rule plot_coverage:
         ax.spines[['right', 'top']].set_visible(False)
         ax.legend(frameon=False, bbox_to_anchor=(0.99, 0.98), loc="upper left")
         
-        fig.tight_layout()
         fig.savefig(str(output))
