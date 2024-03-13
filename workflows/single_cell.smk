@@ -47,6 +47,8 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 matplotlib.use("Agg")
 
+from subplots_from_axsize import subplots_from_axsize
+
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
@@ -115,8 +117,11 @@ def plot_cells(
     encoder: LabelEncoder,
     seed: int = 123,
     cmap: str = "Set1",
+    # Legend settings
     include_legend: bool = False,
     bbox_to_anchor: tuple[float, float] = (1, 1),
+    fontsize: int = 8,
+    ncol: int = 1,
 ):
     cmap = plt.cm.get_cmap(cmap)
     colors = {name: cmap(i / len(encoder.classes_)) for i, name in enumerate(encoder.classes_)}
@@ -136,7 +141,7 @@ def plot_cells(
 
     if include_legend:
         patches = [mpatches.Patch(color=color, label=name) for name, color in colors.items()]
-        ax.legend(handles=patches, loc="upper left", bbox_to_anchor=bbox_to_anchor, frameon=False)
+        ax.legend(handles=patches, loc="upper left", bbox_to_anchor=bbox_to_anchor, frameon=False, fontsize=fontsize, ncol=ncol)
 
 
 rule plot_p_x_y:
@@ -159,14 +164,15 @@ rule plot_p_x_y:
 
         # Set scales for the axes
         _reps = pca.transform(get_features(adata))
+        _offset = 3
         for ax in axs[0, :]:
-            ax.set_xlim(np.min(_reps[:, 0]) - 1, np.max(_reps[:, 0]) + 1)
-            ax.set_ylim(np.min(_reps[:, 1]) - 1, np.max(_reps[:, 1]) + 1)
+            ax.set_xlim(np.min(_reps[:, 0]) - _offset, np.max(_reps[:, 0]) + _offset)
+            ax.set_ylim(np.min(_reps[:, 1]) - _offset, np.max(_reps[:, 1]) + _offset)
             ax.set_xlabel("PC 1")
             ax.set_ylabel("PC 2")
         for ax in axs[1, :]:
-            ax.set_xlim(np.min(_reps[:, 2]) - 1, np.max(_reps[:, 2]) + 1)
-            ax.set_ylim(np.min(_reps[:, 3]) - 1, np.max(_reps[:, 3]) + 1)
+            ax.set_xlim(np.min(_reps[:, 2]) - _offset, np.max(_reps[:, 2]) + _offset)
+            ax.set_ylim(np.min(_reps[:, 3]) - _offset, np.max(_reps[:, 3]) + _offset)
             ax.set_xlabel("PC 3")
             ax.set_ylabel("PC 4")
         del _reps
@@ -194,7 +200,8 @@ rule manuscript_plot:
         pca.fit(get_features(adata))
         reps = pca.transform(get_features(adata))
 
-        fig, axs = plt.subplots(1, 4, figsize=(6, 1.5), dpi=150)
+        fig, axs = subplots_from_axsize(axsize=([1, 1, 1.5, 1.5], 1), dpi=150, top=0.3, left=0.1, wspace=[0.3, 0.5, 0.5])
+        axs = axs.ravel()
 
         cell_type_encoder, sample_encoder = construct_encoders(adata)
 
@@ -205,14 +212,16 @@ rule manuscript_plot:
             ax.spines[["top", "right", "left", "bottom"]].set_visible(False)
             ax.set_xticks([])
             ax.set_yticks([])
-    
-        axs[0].set_title("Cell types")
-        plot_cells(axs[0], reps[:, 0], reps[:, 1], types=adata.obs["cell_type"], encoder=cell_type_encoder, include_legend=True, bbox_to_anchor=(1, 1))
+            ax.set_xlim(np.min(reps[:, 0]) - 1, np.max(reps[:, 0]) + 1)
+            ax.set_ylim(np.min(reps[:, 1]) - 1, np.max(reps[:, 1]) + 1)
 
-        axs[1].set_title("Samples")
-        plot_cells(axs[1], reps[:, 0], reps[:, 1], types=adata.obs["sample"], encoder=sample_encoder, cmap="tab10")
+        axs[0].set_title("Samples")
+        plot_cells(axs[0], reps[:, 0], reps[:, 1], types=adata.obs["sample"], encoder=sample_encoder, cmap="Pastel1")
 
-        fig.tight_layout()
+        axs[1].set_title("Cell types")
+        plot_cells(axs[1], reps[:, 0], reps[:, 1], types=adata.obs["cell_type"], encoder=cell_type_encoder, include_legend=True, bbox_to_anchor=(-1.3, -0.05), fontsize=6, ncol=3)
+
+        # fig.tight_layout()
         fig.savefig(output[0])
 
 # rule estimate_proportions:
