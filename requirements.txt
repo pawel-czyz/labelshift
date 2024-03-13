@@ -1,9 +1,10 @@
 arviz
+matplotlib
 numpy
-petname
 pydantic
 scikit-learn
 scipy
+subplots_from_axsize
 # Code quality tools
 black
 flake8

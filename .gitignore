@@ -2,6 +2,8 @@
 *.nb
 *.ipynb
 
+data/Darmanis
+
 # Directories for local files
 local/
 private/
