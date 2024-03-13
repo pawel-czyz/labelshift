@@ -1,5 +1,3 @@
-![build](https://github.com/labelshift/labelshift/actions/workflows/build.yml/badge.svg)
-
 # Label Shift
 
 Python library for *quantification* (estimating the class prevalence in an unlabeled data set) under the prior probability shift assumption.
