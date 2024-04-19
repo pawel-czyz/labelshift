@@ -250,7 +250,7 @@ rule manuscript_plot:
 
         def plot(ax, props):
             x_axis = np.arange(len(props["cell_types"]))
-            ax.set_xticks(x_axis, labels=props["cell_types"], rotation=70)
+            ax.set_xticks(x_axis, labels=props["cell_types"], rotation=63)
             ax.set_ylabel("Proportion")
 
             # Ground-truth
