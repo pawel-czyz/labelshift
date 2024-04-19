@@ -26,16 +26,16 @@ P_TEST_C: str = "P_test(C)"
 P_C_COND_Y: str = "P(C|Y)"
 
 
-def model(summary_statistic):
+def model(summary_statistic, alpha: float = 1.0):
     n_y_labeled = summary_statistic.n_y_labeled
     n_y_and_c_labeled = summary_statistic.n_y_and_c_labeled
     n_c_unlabeled = summary_statistic.n_c_unlabeled
     K = len(n_c_unlabeled)
     L = len(n_y_labeled)
 
-    pi = numpyro.sample(P_TRAIN_Y, dist.Dirichlet(jnp.ones(L)))
-    pi_ = numpyro.sample(P_TEST_Y, dist.Dirichlet(jnp.ones(L)))
-    p_c_cond_y = numpyro.sample(P_C_COND_Y, dist.Dirichlet(jnp.ones(K).repeat(L).reshape(L, K)))
+    pi = numpyro.sample(P_TRAIN_Y, dist.Dirichlet(alpha * jnp.ones(L)))
+    pi_ = numpyro.sample(P_TEST_Y, dist.Dirichlet(alpha * jnp.ones(L)))
+    p_c_cond_y = numpyro.sample(P_C_COND_Y, dist.Dirichlet(alpha * jnp.ones(K).repeat(L).reshape(L, K)))
 
     N_y = numpyro.sample('N_y', dist.Multinomial(jnp.sum(n_y_labeled), pi), obs=n_y_labeled)
     
@@ -56,12 +56,16 @@ class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
     P_TEST_C = P_TEST_C
     P_C_COND_Y = P_C_COND_Y
 
-    def __init__(self, params: Optional[SamplingParams] = None, seed: int = 42) -> None:
+    def __init__(self, params: Optional[SamplingParams] = None, seed: int = 42, alpha: float = 1.0) -> None:
         if params is None:
             params = SamplingParams()
         self._params = params
         self._seed = seed
         self._mcmc = None
+
+        if alpha <= 0:
+            raise ValueError("Concentration parameter alpha has to be positive.")
+        self._alpha = alpha
 
     def sample_posterior(self, /, statistic: pe.SummaryStatistic):
         """Returns the samples from the MCMC sampler."""
@@ -72,7 +76,7 @@ class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
             num_chains=self._params.chains,
         )
         rng_key = jax.random.PRNGKey(self._seed)
-        mcmc.run(rng_key, summary_statistic=statistic)
+        mcmc.run(rng_key, summary_statistic=statistic, alpha=self._alpha)
         self._mcmc = mcmc
         return mcmc.get_samples()
 
