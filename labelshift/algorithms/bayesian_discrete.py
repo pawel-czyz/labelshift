@@ -17,6 +17,7 @@ class SamplingParams(pydantic.BaseModel):
 
     warmup: pydantic.PositiveInt = pydantic.Field(default=500)
     samples: pydantic.PositiveInt = pydantic.Field(default=1000)
+    chains: pydantic.PositiveInt = pydantic.Field(default=1)
 
 
 P_TRAIN_Y: str = "P_train(Y)"
@@ -60,15 +61,19 @@ class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
             params = SamplingParams()
         self._params = params
         self._seed = seed
+        self._mcmc = None
 
     def sample_posterior(self, /, statistic: pe.SummaryStatistic):
         """Returns the samples from the MCMC sampler."""
         mcmc = numpyro.infer.MCMC(
             numpyro.infer.NUTS(model),
             num_warmup=self._params.warmup,
-            num_samples=self._params.samples)
+            num_samples=self._params.samples,
+            num_chains=self._params.chains,
+        )
         rng_key = jax.random.PRNGKey(self._seed)
         mcmc.run(rng_key, summary_statistic=statistic)
+        self._mcmc = mcmc
         return mcmc.get_samples()
 
     def estimate_from_summary_statistic(
@@ -77,3 +82,9 @@ class DiscreteCategoricalMeanEstimator(pe.SummaryStatisticPrevalenceEstimator):
         """Returns the mean prediction."""
         samples = self.sample_posterior(statistic)[P_TEST_Y]
         return np.array(samples.mean(axis=0))
+
+    def get_mcmc(self):
+        """Returns the MCMC object."""
+        if self._mcmc is None:
+            raise ValueError("Run `sample_posterior` to obtain MCMC samples first.")
+        return self._mcmc

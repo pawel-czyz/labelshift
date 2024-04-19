@@ -38,7 +38,7 @@
 #   ISSN 2211-1247, https://doi.org/10.1016/j.celrep.2017.10.030.
 #
 # -------------------------------------------------------------------------------------------------------
-
+from contextlib import redirect_stdout
 import numpy as np
 import pandas as pd
 import scanpy as sc
@@ -292,7 +292,8 @@ rule estimate_proportions:
     input: "data/{name}_data.h5ad"
     output:
         estimates = "proportions/{name}.npz",
-        error_log = "proportions/{name}.log"
+        error_log = "proportions/{name}.log",
+        convergence = "convergence/{name}.txt"
     run:
         # Load the data
         adata = sc.read_h5ad(input[0])
@@ -332,7 +333,12 @@ rule estimate_proportions:
             n_c_unlabeled=n_c_unlabeled,
         )
 
-        posterior = algo.DiscreteCategoricalMeanEstimator().sample_posterior(statistic)[algo.DiscreteCategoricalMeanEstimator.P_TEST_Y]
+        mcmc_algo = algo.DiscreteCategoricalMeanEstimator(params=algo.SamplingParams(chains=4))
+        posterior = mcmc_algo.sample_posterior(statistic)[algo.DiscreteCategoricalMeanEstimator.P_TEST_Y]
+        with open(output.convergence, "w") as fh:
+            with redirect_stdout(fh):
+                mcmc_algo.get_mcmc().print_summary()
+
 
         failed_counter = 0
 
