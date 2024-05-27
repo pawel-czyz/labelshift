@@ -1,4 +1,5 @@
 """Partition of the real line into intervals."""
+
 from typing import List, Sequence, Tuple
 
 import numpy as np

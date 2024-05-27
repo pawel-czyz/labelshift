@@ -1,4 +1,5 @@
 """Common NumPy utilities for dealing with probabilities."""
+
 import numpy as np
 from numpy.typing import ArrayLike
 

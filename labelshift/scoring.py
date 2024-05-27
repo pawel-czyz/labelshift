@@ -5,6 +5,7 @@ P. Gonzalez, A. Castano, N.V. Chawla, J. J. del Coz,
 A Review on Quantification Learning,
 ACM Computing Surveys, Vol. 50, No. 5. DOI: https://dl.acm.org/doi/10.1145/3117807
 """
+
 from typing import cast, Protocol
 
 import numpy as np

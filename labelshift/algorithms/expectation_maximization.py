@@ -1,4 +1,5 @@
 """Expectation Maximization algorithm."""
+
 import warnings
 from typing import Optional
 import numpy as np

@@ -1,4 +1,5 @@
 """Utilities for working with NumPy datasets."""
+
 import dataclasses
 from typing import List, Protocol
 

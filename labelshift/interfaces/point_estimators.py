@@ -1,5 +1,6 @@
 """Protocols for point estimators for P_test(Y),
 which may have access to different data modalities."""
+
 import dataclasses
 from typing import Protocol
 
