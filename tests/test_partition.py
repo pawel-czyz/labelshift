@@ -1,4 +1,5 @@
 """Tests of the `partition` submodule."""
+
 import numpy as np
 import pytest
 from scipy import stats

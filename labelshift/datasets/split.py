@@ -1,4 +1,5 @@
 """Utilities for working with NumPy datasets."""
+
 import dataclasses
 from typing import List, Protocol
 
@@ -72,7 +73,7 @@ def split_dataset(
 
     if set(np.unique(dataset.target)) != set(range(n_labels)):
         raise ValueError(
-            f"Labels must be 0-indexed integers: {dataset.target_names} != "
+            f"Labels must be 0-indexed integers: {dataset.target} != "
             f"{set(range(n_labels))}."
         )
     if {

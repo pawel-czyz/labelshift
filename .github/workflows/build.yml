@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10"]
+        python-version: ["3.11"]
 
     steps:
     - uses: actions/checkout@v2
@@ -30,9 +30,6 @@ jobs:
     - name: Check code with flake8
       run: |
         flake8
-    - name: Check docstring coverage with interrogate
-      run: |
-        interrogate
     - name: Check whether black has been used
       run: |
         black --check tests

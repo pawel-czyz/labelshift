@@ -41,6 +41,7 @@ According to our conventions, we will use the transpose of this matrix:
   ``H_hat[l, k] = G_hat[l, k] = E_labeled[ g(X)[k]  | Y = l] \\in R^{L x (K-1)}.``
 
 """
+
 from typing import Optional, Tuple
 
 import numpy as np

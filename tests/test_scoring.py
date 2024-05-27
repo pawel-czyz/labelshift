@@ -1,4 +1,5 @@
 """Tests of the scoring submodule."""
+
 from typing import List
 
 import numpy as np

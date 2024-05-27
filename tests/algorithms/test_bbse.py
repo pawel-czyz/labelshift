@@ -1,4 +1,5 @@
 """Tests for the BBSE submodule."""
+
 import pytest
 import numpy as np
 

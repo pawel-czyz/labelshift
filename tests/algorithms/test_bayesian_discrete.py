@@ -1,4 +1,5 @@
 """Tests for the labelshift/algorithms/bayesian_discrete.py"""
+
 import numpy as np
 import pytest
 
@@ -28,22 +29,13 @@ def test_right_values(n_labeled: int = 10_000, n_unlabeled: int = 10_000) -> Non
         n_labeled=n_labeled, n_unlabeled=n_unlabeled, seed=111
     )
 
-    params = bd.SamplingParams(chains=1, draws=100)
+    params = bd.SamplingParams(chains=1, warmup=100, draws=100)
+    estimator = bd.DiscreteCategoricalMeanEstimator(params)
 
-    model = bd.build_model(
-        n_y_and_c_labeled=statistic.n_y_and_c_labeled,
-        n_c_unlabeled=statistic.n_c_unlabeled,
-    )
+    estimator.estimate_from_summary_statistic(statistic)
 
-    inference_result = bd.sample_from_bayesian_discrete_model_posterior(
-        model=model,
-        sampling_params=params,
-    )
+    samples = estimator.get_mcmc().get_samples()
 
-    def get_mean(key) -> np.ndarray:
-        """Returns the mean over all samples for variable `key`."""
-        return np.asarray(inference_result.posterior.data_vars[key].mean(axis=(0, 1)))
-
-    assert get_mean(bd.P_TEST_Y) == pytest.approx(p_y_unlabeled, abs=0.02)
-    assert get_mean(bd.P_TRAIN_Y) == pytest.approx(p_y_labeled, abs=0.02)
-    assert get_mean(bd.P_C_COND_Y) == pytest.approx(p_c_cond_y, abs=0.02)
+    assert samples[bd.P_TEST_Y].mean(axis=0) == pytest.approx(p_y_unlabeled, abs=0.02)
+    assert samples[bd.P_TRAIN_Y].mean(axis=0) == pytest.approx(p_y_labeled, abs=0.02)
+    assert samples[bd.P_C_COND_Y].mean(axis=0) == pytest.approx(p_c_cond_y, abs=0.02)

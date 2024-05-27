@@ -1,5 +1,6 @@
 """Model used for working with exact probabilities
 in the Gaussian mixture model."""
+
 from typing import Protocol
 
 import numpy as np

@@ -1,4 +1,5 @@
 """Fixtures for pytests."""
+
 import random
 from typing import Sequence
 

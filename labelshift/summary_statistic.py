@@ -1,4 +1,5 @@
 """Used to calculate summary statistic of discrete data."""
+
 from typing import Sequence
 
 import numpy as np

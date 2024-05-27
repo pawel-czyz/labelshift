@@ -5,6 +5,7 @@ Based on:
   Detecting and Correcting for Label Shift with Black Box Predictors
   https://arxiv.org/pdf/1802.03916.pdf
 """
+
 from typing import Optional
 
 import numpy as np

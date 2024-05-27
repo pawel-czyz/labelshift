@@ -1,4 +1,5 @@
 """Tests of the `timer` submodule."""
+
 import time
 
 import pytest

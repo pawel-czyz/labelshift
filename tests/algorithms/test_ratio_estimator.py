@@ -1,4 +1,5 @@
 """Tests of the Invariant Ratio Estimator algorithm."""
+
 import numpy as np
 import pytest
 

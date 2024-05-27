@@ -1,4 +1,5 @@
 """Tests for Expectation Maximization."""
+
 import numpy as np
 import numpy.testing as nptest
 import pytest

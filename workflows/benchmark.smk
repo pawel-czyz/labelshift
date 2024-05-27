@@ -6,6 +6,7 @@ import joblib
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.transforms as mtransforms
 matplotlib.use("Agg")
 
 import numpy as np
@@ -349,6 +350,10 @@ rule plot_results_rule:
         fig.tight_layout()
         fig.savefig(str(output))
 
+def label_ax(fig, ax, label):
+    trans = mtransforms.ScaledTranslation(11/72, -1/72, fig.dpi_scale_trans)
+    ax.text(0.0, 1.0, f"{label}.", transform=ax.transAxes + trans, fontsize='medium', verticalalignment='top')
+
 
 rule plot_large_plot:
     output: "plots/summary-{metric}.pdf"
@@ -374,6 +379,7 @@ rule plot_large_plot:
         data = pd.read_csv(input.prevalence, index_col=False)
         plot_results(ax, data)
         ax.set_xlabel("Prevalence $\\pi'_1$")
+        label_ax(fig, ax, "a")
 
         # Unlabeled data set size
         ax = axs[0, 1]
@@ -381,12 +387,15 @@ rule plot_large_plot:
         plot_results(ax, data)
         ax.set_xscale("log", base=10)
         ax.set_xlabel("Unlabeled sample size $N'$")
+        label_ax(fig, ax, "b")
+
 
         # Classifier quality
         ax = axs[0, 2]
         data = pd.read_csv(input.quality, index_col=False)
         plot_results(ax, data)
         ax.set_xlabel("Classifier quality $q$")
+        label_ax(fig, ax, "c")
 
         ax.legend(frameon=False, bbox_to_anchor=(1.05, 1), loc="upper left")
 
@@ -396,6 +405,7 @@ rule plot_large_plot:
         plot_results(ax, data)
         ax.set_xlabel("Classifier outputs $K$")
         ax.set_xticks([3, 5, 7, 9])
+        label_ax(fig, ax,  "d")
 
         # Change L = K
         ax = axs[1, 1]
@@ -403,6 +413,7 @@ rule plot_large_plot:
         plot_results(ax, data)
         ax.set_xlabel("Number of labels $L=K$")
         ax.set_xticks([3, 5, 7, 9])
+        label_ax(fig, ax,  "e")
 
         # Change misspecification
         ax = axs[1, 2]
@@ -410,6 +421,7 @@ rule plot_large_plot:
         plot_results(ax, data)
         ax.set_xlabel("Misspecified quality $q'$")
         ax.axvline(0.85, color="black", linestyle="--")
+        label_ax(fig, ax,  "f")
 
         fig.tight_layout()
         fig.savefig(str(output))
