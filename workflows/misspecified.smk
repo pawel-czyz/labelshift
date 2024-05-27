@@ -131,8 +131,9 @@ rule run_gaussian_mcmc:
         data_labeled, data_unlabeled = joblib.load(str(input))
         mcmc = numpyro.infer.MCMC(
             numpyro.infer.NUTS(gaussian_model),
-            num_warmup=N_MCMC_WARMUP,
-            num_samples=N_MCMC_SAMPLES,
+            num_warmup=1500,
+            num_samples=2000,
+            num_chains=4,
         )
         rng_key = jax.random.PRNGKey(int(wildcards.seed) + 101)
         mcmc.run(rng_key, observed=data_labeled, unobserved=data_unlabeled.xs)
@@ -152,8 +153,9 @@ rule run_student_mcmc:
         data_labeled, data_unlabeled = joblib.load(str(input))
         mcmc = numpyro.infer.MCMC(
             numpyro.infer.NUTS(student_model),
-            num_warmup=N_MCMC_WARMUP,
-            num_samples=N_MCMC_SAMPLES,
+            num_warmup=1500,
+            num_samples=2000,
+            num_chains=4,
         )
         rng_key = jax.random.PRNGKey(int(wildcards.seed) + 101)
         mcmc.run(rng_key, observed=data_labeled, unobserved=data_unlabeled.xs)
