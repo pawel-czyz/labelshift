@@ -57,8 +57,9 @@ N_POINTS = [100, 1000, 10_000]
 PI_LABELED = 0.5
 PI_UNLABELED = 0.2
 
-N_MCMC_WARMUP = 500
-N_MCMC_SAMPLES = 1000
+N_MCMC_WARMUP = 1500
+N_MCMC_SAMPLES = 2000
+N_MCMC_CHAINS = 4
 
 
 COVERAGES = np.arange(0.05, 0.96, 0.05)
@@ -131,9 +132,9 @@ rule run_gaussian_mcmc:
         data_labeled, data_unlabeled = joblib.load(str(input))
         mcmc = numpyro.infer.MCMC(
             numpyro.infer.NUTS(gaussian_model),
-            num_warmup=1500,
-            num_samples=2000,
-            num_chains=4,
+            num_warmup=N_MCMC_WARMUP,
+            num_samples=N_MCMC_SAMPLES,
+            num_chains=N_MCMC_CHAINS,
         )
         rng_key = jax.random.PRNGKey(int(wildcards.seed) + 101)
         mcmc.run(rng_key, observed=data_labeled, unobserved=data_unlabeled.xs)
@@ -153,9 +154,9 @@ rule run_student_mcmc:
         data_labeled, data_unlabeled = joblib.load(str(input))
         mcmc = numpyro.infer.MCMC(
             numpyro.infer.NUTS(student_model),
-            num_warmup=1500,
-            num_samples=2000,
-            num_chains=4,
+            num_warmup=N_MCMC_WARMUP,
+            num_samples=N_MCMC_SAMPLES,
+            num_chains=N_MCMC_CHAINS,
         )
         rng_key = jax.random.PRNGKey(int(wildcards.seed) + 101)
         mcmc.run(rng_key, observed=data_labeled, unobserved=data_unlabeled.xs)
@@ -194,7 +195,11 @@ rule run_discrete_mcmc:
         data_labeled, data_unlabeled = joblib.load(str(input))
         estimator = algo.DiscreteCategoricalMeanEstimator(
             seed=int(wildcards.seed) + 101,
-            params=algo.SamplingParams(warmup=N_MCMC_WARMUP, samples=N_MCMC_SAMPLES),
+            params=algo.SamplingParams(
+                warmup=N_MCMC_WARMUP,
+                samples=N_MCMC_SAMPLES,
+                chains=N_MCMC_CHAINS,
+            ),
         )
         samples = estimator.sample_posterior(generate_summary_statistic(data_labeled, data_unlabeled.xs, int(wildcards.n_bins)))
         joblib.dump(samples, output.samples)
