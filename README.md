@@ -1,30 +1,30 @@
-# Label Shift
+[![Project Status: Concept – Minimal or no implementation has been done yet, or the repository is only intended to be a limited example, demo, or proof-of-concept.](https://www.repostatus.org/badges/latest/concept.svg)](https://www.repostatus.org/#concept)
+[![Venue](https://img.shields.io/badge/venue-TMLR_2024-darkblue)](https://openreview.net/forum?id=Ft4kHrOawZ)
+[![build](https://github.com/pawel-czyz/labelshift/actions/workflows/build.yml/badge.svg)](https://github.com/pawel-czyz/labelshift/actions/workflows/build.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Python library for *quantification* (estimating the class prevalence in an unlabeled data set) under the prior probability shift assumption.
+# Bayesian quantification with black-box estimators
 
-This module is created with two purposes in mind:
-  - easily apply state-of-the-art quantification algorithms to the real problems,
-  - benchmark novel quantification algorithms against others.
-
-It is compatible with any classifier using any machine learning framework.
-
-The code inside was used to run the experiments in [our preprint](https://arxiv.org/abs/2302.09159), which can be cited as:
-```
-@misc{https://doi.org/10.48550/arxiv.2302.09159,
-  doi = {10.48550/ARXIV.2302.09159},
-  url = {https://arxiv.org/abs/2302.09159},
-  author = {Ziegler, Albert and Czyż, Paweł},
-  title = {Bayesian Quantification with Black-Box Estimators},
-  publisher = {arXiv},
-  year = {2023}
-}
-```
+*Quantification* is the problem of estimating the label prevalence from an unlabeled data set. In this repository we provide the code associated with our manuscript, which can be used to reproduce the experiments.
 
 ## Installation
-Currently the module is in early development stage and is not ready to be installed. It does not have proper documentation either. We hope to change it soon – thank you for your patience!
 
-## Contributions
-Contributions are very welcome! Please, check our [Contribution guide](CONTRIBUTING.md).
+We recommend using [Micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) to set a new Python 3.11 environment.
+Then, the package can be installed with:
 
+```bash
+$ pip install -e .
+```
 
+To reproduce the experiments, install [Snakemake](https://snakemake.readthedocs.io/en/stable/) using the instructions provided. Then, install additional dependencies:
+
+```bash
+$ pip install -r requirements.txt
+```
+
+The experiments can be reproduced by running:
+
+```bash
+$ snakemake -c4 -s workflows/WORKFLOW_NAME.smk
+```
 
