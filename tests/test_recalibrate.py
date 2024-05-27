@@ -1,4 +1,5 @@
 """Tests for recalibration."""
+
 from typing import Tuple
 import numpy as np
 import numpy.testing as nptest

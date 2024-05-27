@@ -1,4 +1,5 @@
 """Tests for the auxilary probability submodule."""
+
 import numpy.testing as nptest
 import pytest
 

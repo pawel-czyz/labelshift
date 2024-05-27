@@ -1,4 +1,5 @@
 """Tests of the Gaussian mixture module."""
+
 import numpy as np
 import pytest
 

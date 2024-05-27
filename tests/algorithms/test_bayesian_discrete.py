@@ -1,4 +1,5 @@
 """Tests for the labelshift/algorithms/bayesian_discrete.py"""
+
 import numpy as np
 import pytest
 

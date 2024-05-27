@@ -1,4 +1,5 @@
 """Tests of `labelshift.datasets.split`."""
+
 import numpy as np
 import pytest
 from sklearn import datasets

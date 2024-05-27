@@ -1,4 +1,5 @@
 """Tests for the discrete categorical sampler."""
+
 from typing import Sequence
 
 import numpy as np

@@ -1,4 +1,5 @@
 """Tests for the module calculating the summary statistic in the discrete case."""
+
 import numpy as np
 import pytest
 
