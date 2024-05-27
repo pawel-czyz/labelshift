@@ -10,7 +10,7 @@ import matplotlib.transforms as mtransforms
 matplotlib.use("Agg")
 
 import numpy as np
-
+from numpyro.diagnostics import summary
 
 import labelshift.algorithms.api as algo
 import labelshift.experiments.api as exp
@@ -22,7 +22,7 @@ ESTIMATORS = {
     "BBS": algo.BlackBoxShiftEstimator(),
     "CC": algo.ClassifyAndCount(),
     "RIR": algo.InvariantRatioEstimator(restricted=True),
-    "BAY": algo.DiscreteCategoricalMeanEstimator(),
+    "BAY": algo.DiscreteCategoricalMeanEstimator(params=algo.SamplingParams(chains=4)),
 }
 ESTIMATOR_COLORS = {
     "BBS": "orangered",
@@ -146,6 +146,7 @@ _k_vals = [2, 3, 5, 7, 9]
 _quality = [0.55, 0.65, 0.75, 0.85, 0.95]
 _quality_prime = [0.45, 0.55, 0.65, 0.75, 0.80, 0.85, 0.90, 0.95]
 
+
 BENCHMARKS = {
     "change_prevalence": BenchmarkSettings(
         param_name="Prevalence $\\pi'_1$",
@@ -178,6 +179,7 @@ BENCHMARKS = {
         settings=[generate_data_setting(quality_unlabeled=value) for value in _quality_prime],
     ),
 }
+
 
 def get_data_setting(benchmark: str, param: int | str) -> DataSetting:
     return BENCHMARKS[str(benchmark)].settings[int(param)]
@@ -234,6 +236,14 @@ rule apply_estimator:
             elapsed_time = timer.check()
             run_ok = True
             additional_info = {}
+
+            if hasattr(estimator, "get_mcmc"):
+                samples = estimator.get_mcmc().get_samples(group_by_chain=True)
+                summ = summary(samples)
+                n_eff_list = [np.min(d["n_eff"]) for d in summ.values()]
+                r_hat_list = [np.max(d["r_hat"]) for d in summ.values()]
+                additional_info = additional_info | {"min_n_eff": min(n_eff_list), "max_r_hat": max(r_hat_list)}
+
         except Exception as e:
             elapsed_time = float("nan")
             estimate = np.full_like(data.n_y_labeled, fill_value=float("nan"))
@@ -267,9 +277,13 @@ def _get_paths_to_be_assembled(wildcards):
 rule assemble_results:
     output:
         csv = "results/benchmark-{benchmark}-metric-{metric}.csv",
-        err = "results/status/benchmark-{benchmark}-metric-{metric}.txt"
+        err = "results/status/benchmark-{benchmark}-metric-{metric}.txt",
+        convergence = "results/convergence/benchmark-{benchmark}-metric-{metric}.txt",
     input: _get_paths_to_be_assembled
     run:
+        max_r_hat = -1e9
+        min_n_eff = 1e9
+
         results = []
         for pth in input:
             res = joblib.load(pth)
@@ -285,6 +299,10 @@ rule assemble_results:
             }
             results.append(nice)
         
+            if "max_r_hat" in res.additional_info:
+                max_r_hat = max(max_r_hat, res.additional_info["max_r_hat"])
+                min_n_eff = min(min_n_eff, res.additional_info["min_n_eff"])
+
         results = pd.DataFrame(results)
 
         df_ok = results[results["run_ok"]]
@@ -298,6 +316,9 @@ rule assemble_results:
         df_ok = df_ok.drop(columns=["run_ok", "additional_info"])
         df_ok.to_csv(str(output.csv), index=False)
 
+        with open(output.convergence, "w") as f:
+            f.write(f"Max r_hat: {max_r_hat}\n")
+            f.write(f"Min n_eff: {min_n_eff}\n")
 
 
 def plot_results(ax, df, plot_std: bool = True, alpha: float = 0.5):
