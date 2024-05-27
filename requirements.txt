@@ -8,7 +8,6 @@ subplots_from_axsize
 # Code quality tools
 black
 flake8
-interrogate
 pre-commit
 pytest
 pytest-cov

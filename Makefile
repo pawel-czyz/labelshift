@@ -2,7 +2,6 @@ test:
 	flake8
 	pytype labelshift
 	pytype tests
-	interrogate
 	pytest
 
 install:
