@@ -150,7 +150,7 @@ rule run_student_mcmc:
     output:
         samples = "samples/{n_points}/Student/{seed}.npy",
         convergence = "convergence/{n_points}/Student/{seed}.joblib",
-    run:    
+    run:
         data_labeled, data_unlabeled = joblib.load(str(input))
         mcmc = numpyro.infer.MCMC(
             numpyro.infer.NUTS(student_model),
@@ -306,7 +306,7 @@ rule plot_coverage:
         sample_discrete10 = "samples/{n_points}/Discrete-10/1.npy",
     output: "plots/{n_points}.pdf"
     run:
-        fig, axs = subplots_from_axsize(axsize=(2, 1), wspace=[0.2, 0.3, 0.6],  dpi=150, left=0.2, top=0.3, right=1.8)
+        fig, axs = subplots_from_axsize(axsize=(2, 1), wspace=[0.2, 0.3, 0.6],  dpi=400, left=0.2, top=0.3, right=1.8)
         axs = axs.ravel()
 
         # Conditional distributions P(X|Y)
