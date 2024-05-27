@@ -147,7 +147,7 @@ rule plot:
         bbs = "samples/bootstrap-BBS/{setting}-{seed}.npy"
     output: "figures/{setting}-{seed}.pdf"
     run:
-        fig, axs = plt.subplots(1, 4, figsize=(8, 2), dpi=130, sharex=True, sharey=True)
+        fig, axs = plt.subplots(1, 4, figsize=(8, 2), dpi=400, sharex=True, sharey=True)
         
         ax = axs[0]
         ax.set_ylabel("Prevalence")
