@@ -5,7 +5,7 @@
 
 # Bayesian quantification with black-box estimators
 
-*Quantification* is the problem of estimating the label prevalence from an unlabeled data set. In this repository we provide the code associated with our manuscript, which can be used to reproduce the experiments.
+*Quantification* is the problem of estimating the label prevalence from an unlabeled data set. In this repository we provide the code associated with our [manuscript](https://openreview.net/forum?id=Ft4kHrOawZ), which can be used to reproduce the experiments.
 
 ## Installation
 
@@ -26,5 +26,22 @@ The experiments can be reproduced by running:
 
 ```bash
 $ snakemake -c4 -s workflows/WORKFLOW_NAME.smk
+```
+
+
+## Citation
+
+In order to cite this code, please use:
+
+```
+@article{
+    Ziegler-Czyz-2024-Bayesian-Quantification,
+    title={Bayesian Quantification with Black-Box Estimators},
+    author={Albert Ziegler and Pawe{\l} Czy{\.z}},
+    journal={Transactions on Machine Learning Research},
+    issn={2835-8856},
+    year={2024},
+    url={https://openreview.net/forum?id=Ft4kHrOawZ}
+}
 ```
 
